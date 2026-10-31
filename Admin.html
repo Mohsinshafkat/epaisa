@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Easypaisa Admin Control Panel - Cloud</title>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; width: 100%; min-height: 100vh;
+    background-color: #f4f6f5; font-family: Arial, sans-serif; color: #2e2a36;
+  }
+  .login-wrapper { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 16px; }
+  .login-box {
+    background: #ffffff; width: 100%; max-width: 420px; padding: 36px 28px;
+    border-radius: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); border: 2px solid #d8deda; text-align: center;
+  }
+  .input-field {
+    width: 100%; padding: 14px 18px; margin-bottom: 16px; background: #ffffff;
+    border: 2px solid #d8deda; border-radius: 30px; font-size: 15px; outline: none;
+  }
+  .input-field:focus { border-color: #25b368; }
+  .btn-primary {
+    width: 100%; height: 48px; background: #25b368; color: #fff;
+    border: none; border-radius: 30px; font-weight: 700; font-size: 16px; cursor: pointer;
+  }
+  .dashboard { display: none; padding: 20px; max-width: 1200px; margin: 0 auto; }
+  .dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+  .btn-logout { background: #ef4444; color: #fff; border: none; padding: 8px 18px; border-radius: 20px; cursor: pointer; font-weight: 600; }
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .stat-card { background: #ffffff; padding: 20px; border-radius: 20px; border: 2px solid #d8deda; }
+  .panel-card { background: #ffffff; border-radius: 20px; border: 2px solid #d8deda; padding: 24px; margin-bottom: 24px; }
+  .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
+  table { width: 100%; border-collapse: collapse; text-align: left; }
+  th, td { padding: 14px 16px; border-bottom: 1px solid #e0e0e0; font-size: 14px; }
+  th { background: #f4f6f5; font-weight: 700; }
+  .btn-sm { padding: 6px 12px; border-radius: 8px; border: none; font-size: 12px; font-weight: 600; cursor: pointer; color: #fff; }
+  .btn-recharge { background: #3b82f6; }
+  .btn-block { background: #f59e0b; }
+  .btn-unblock { background: #25b368; }
+  .btn-delete { background: #ef4444; }
+</style>
+</head>
+<body>
+
+<div class="login-wrapper" id="loginWrapper">
+  <div class="login-box">
+    <h2>Admin Cloud Login</h2>
+    <form onsubmit="handleAdminLogin(event)">
+      <input type="text" id="adminUser" class="input-field" placeholder="Admin Username" required>
+      <input type="password" id="adminPass" class="input-field" placeholder="Admin Password" required>
+      <button type="submit" class="btn-primary">Login</button>
+    </form>
+  </div>
+</div>
+
+<div class="dashboard" id="dashMain">
+  <div class="dash-header">
+    <h2>Easypaisa Admin Cloud Panel</h2>
+    <button class="btn-logout" onclick="logoutAdmin()">Logout</button>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div style="color:#666; font-size:13px;">Total Registered Users</div>
+      <div id="statTotalUsers" style="font-size:24px; font-weight:700;">0</div>
+    </div>
+    <div class="stat-card">
+      <div style="color:#666; font-size:13px;">Total User Balance</div>
+      <div id="statTotalBalance" style="font-size:24px; font-weight:700;">Rs. 0.00</div>
+    </div>
+  </div>
+
+  <div class="panel-card">
+    <h3>+ Create New User in Cloud</h3>
+    <form onsubmit="createUserInCloud(event)">
+      <div class="form-grid">
+        <input type="text" id="addName" class="input-field" placeholder="Full Name" required>
+        <input type="text" id="addMobile" class="input-field" placeholder="Mobile No." required>
+        <input type="email" id="addEmail" class="input-field" placeholder="Email (Username)" required>
+        <input type="password" id="addPassword" class="input-field" placeholder="5-Digit PIN" maxlength="5" required>
+        <input type="number" id="addBalance" class="input-field" value="50000" required>
+      </div>
+      <button type="submit" class="btn-primary" style="margin-top: 14px; max-width: 200px;">Create User</button>
+    </form>
+  </div>
+
+  <div class="panel-card">
+    <h3>Cloud Users Database</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>ID No.</th>
+          <th>Name</th>
+          <th>Mobile</th>
+          <th>Email</th>
+          <th>PIN</th>
+          <th>Balance</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="userTableBody"></tbody>
+    </table>
+    <!-- Export to Excel Button -->
+  <button onclick="exportTableToCSV('transactions.csv')" style="margin: 15px 0; padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">
+    📥 Export to Excel (CSV)
+  </button>
+
+  <table id="adminTable" border="1" style="width:100%; margin-top:10px; border-collapse: collapse; text-align: left;">
+    <thead>
+      <tr style="background: #e8f7ee;">
+        <th style="padding: 10px;">Sender (User)</th>
+        <th style="padding: 10px;">Receiver Name</th>
+        <th style="padding: 10px;">Account Number</th>
+        <th style="padding: 10px;">Bank</th>
+        <th style="padding: 10px;">Amount</th>
+        <th style="padding: 10px;">Date & Time</th>
+      </tr>
+    </thead>
+    <tbody id="adminTableBody">
+      <!-- Data JavaScript se yahan load hoga -->
+    </tbody>
+  </table>
+  </div>
+
+</div>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAA5fUGbA6MLxNvsENG1jZFeOdnxp-eSkO",
+    authDomain: "eazypaisa-f7418.firebaseapp.com",
+    projectId: "eazypaisa-f7418",
+    storageBucket: "eazypaisa-f7418.firebasestorage.app",
+    messagingSenderId: "702963002169",
+    appId: "1:702963002169:web:3bfc450e50d413e80a16e8",
+    measurementId: "G-WT86SKYXFT"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  function handleAdminLogin(e) {
+    e.preventDefault();
+    if (document.getElementById('adminUser').value === 'admin' && document.getElementById('adminPass').value === '123') {
+      sessionStorage.setItem('isAdminLoggedIn', 'true');
+      showDashboard();
+    } else {
+      alert('Invalid Admin Credentials!');
+    }
+  }
+
+  function showDashboard() {
+    document.getElementById('loginWrapper').style.display = 'none';
+    document.getElementById('dashMain').style.display = 'block';
+    loadCloudUsers();
+  }
+
+  function logoutAdmin() {
+    sessionStorage.removeItem('isAdminLoggedIn');
+    location.reload();
+  }
+
+  function createUserInCloud(e) {
+    e.preventDefault();
+    const name = document.getElementById('addName').value.trim();
+    const mobile = document.getElementById('addMobile').value.trim();
+    const email = document.getElementById('addEmail').value.trim().toLowerCase();
+    const password = document.getElementById('addPassword').value.trim();
+    const balance = Number(document.getElementById('addBalance').value);
+    const userId = Math.floor(100000 + Math.random() * 900000).toString();
+
+    db.collection('users').doc(email).set({
+      id: userId,
+      name: name,
+      account: mobile,
+      email: email,
+      password: password,
+      balance: balance,
+      isBlocked: false,
+      avatar: 'avatar.jpeg'
+    }).then(() => {
+      alert(`User Created Successfully in Cloud!\nID: #${userId}`);
+      e.target.reset();
+      document.getElementById('addBalance').value = '50000';
+      loadCloudUsers();
+    }).catch(err => {
+      alert('Error: ' + err.message);
+    });
+  }
+
+  function loadCloudUsers() {
+    db.collection('users').get().then((querySnapshot) => {
+      const tbody = document.getElementById('userTableBody');
+      tbody.innerHTML = '';
+      let totalBal = 0;
+      let count = 0;
+
+      if (querySnapshot.empty) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No users found in cloud database.</td></tr>';
+      }
+
+      querySnapshot.forEach((doc) => {
+        count++;
+        const u = doc.data();
+        totalBal += Number(u.balance);
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>#${u.id}</td>
+          <td><strong>${u.name}</strong></td>
+          <td>${u.account}</td>
+          <td>${u.email}</td>
+          <td><code>${u.password}</code></td>
+          <td>Rs. ${Number(u.balance).toLocaleString()}</td>
+          <td>${u.isBlocked ? '<span style="color:red;">Blocked</span>' : '<span style="color:green;">Active</span>'}</td>
+          <td>
+            <button class="btn-sm btn-recharge" onclick="rechargeUser('${u.email}', ${u.balance})">Recharge</button>
+            <button class="btn-sm ${u.isBlocked ? 'btn-unblock' : 'btn-block'}" onclick="toggleBlock('${u.email}', ${!u.isBlocked})">${u.isBlocked ? 'Unblock' : 'Block'}</button>
+            <button class="btn-sm btn-delete" onclick="deleteUser('${u.email}')">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('statTotalUsers').innerText = count;
+      document.getElementById('statTotalBalance').innerText = 'Rs. ' + totalBal.toLocaleString();
+    });
+  }
+
+function rechargeUser(email, currentBal) {
+    const val = prompt('Enter new balance:', currentBal);
+    if (val !== null && val.trim() !== '') {
+      const newBal = Number(val);
+      if (isNaN(newBal)) {
+        alert('Please enter a valid number!');
+        return;
+      }
+
+      db.collection('users').doc(email).update({ 
+        balance: newBal 
+      }).then(() => {
+        alert('Balance updated successfully in Cloud!');
+        loadCloudUsers(); // Table refresh karne ke liye
+      }).catch(err => {
+        alert('Error: ' + err.message);
+      });
+    }
+  }
+
+  function toggleBlock(email, status) {
+    db.collection('users').doc(email).update({ isBlocked: status }).then(() => {
+      alert('Status updated!');
+      loadCloudUsers();
+    });
+  }
+
+  function deleteUser(email) {
+    if (confirm('Delete this user?')) {
+      db.collection('users').doc(email).delete().then(() => {
+        alert('User deleted!');
+        loadCloudUsers();
+      });
+    }
+  }
+
+  window.onload = function() {
+    if (sessionStorage.getItem('isAdminLoggedIn') === 'true') {
+      showDashboard();
+    }
+  };
+</script>
+</body>
+</html>

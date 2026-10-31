@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Transaction Receipt</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    :root {
+        --top: #c2f2db;       /* Top Light Green */
+        --left: #c9f2dc;      /* Left Mint Green */
+        --right: #D9F5E7;     /* Right Mint Green */
+        --mod: #E2F8EC;       /* Middle Soft Green */
+        --bottom: #FCFEFD;    /* Bottom White / Fade */
+    }
+
+    @font-face {
+      font-family: 'Inter Custom';
+      src: url('Inter_24pt-Medium.ttf') format('truetype');
+      font-weight: 500;
+      font-style: normal;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter Custom', Arial, Helvetica, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      background: linear-gradient(135deg, var(--top) 0%, var(--left) 30%, var(--mod) 60%, var(--bottom) 100%);
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .mobile-wrapper {
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      max-width: 480px;
+      background: linear-gradient(180deg, var(--top) 0%, var(--mod) 50%, var(--bottom) 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      padding: 30px 20px 24px 20px;
+      overflow: hidden;
+    }
+
+    /* Top Animation / Coin Video (anim1.mp4) */
+    .top-animation-wrap {
+      width: 110px;
+      height: 110px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 15px;
+      margin-bottom: 25px;
+    }
+
+    .top-animation-wrap video {
+      width: 220%;
+      height: 220%;
+      margin-top: 56px;
+      object-fit: contain;
+      border-radius: 50%;
+    }
+
+    /* Amount Display */
+    .amount-display {
+      font-size: 34px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-top: 90px;
+      margin-bottom: 6px;
+      letter-spacing: -0.5px;
+    }
+
+    .success-text {
+      font-size: 14.5px;
+      font-weight: 500;
+      color: #55685e;
+      margin-bottom: 35px;
+    }
+
+    /* Receiver Logo Badge */
+    .receiver-logo-badge {
+      width: 52px;
+      height: 52px;
+      background: #ffffff;
+      border: 1px solid #d4ded7;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+      padding: 6px;
+    }
+
+    .receiver-logo-badge img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    /* Receiver Details */
+    .receiver-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 6px;
+      letter-spacing: 0.2px;
+    }
+
+    .receiver-account {
+      font-size: 13.5px;
+      font-weight: 500;
+      color: #586960;
+      letter-spacing: 0.5px;
+    }
+
+    /* Bottom Action Buttons Container */
+    .bottom-actions {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: auto;
+      padding-bottom: 10px;
+    }
+
+    .back-home-btn {
+      flex: 1;
+      height: 52px;
+      background: transparent;
+      border: 1.5px solid #25b368;
+      border-radius: 26px;
+      color: #000000;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-decoration: none;
+      outline: none;
+    }
+
+    .back-home-btn:active {
+      background: rgba(0, 184, 98, 0.08);
+    }
+
+    .icon-action-btn {
+      width: 52px;
+      height: 52px;
+      background: transparent;
+      border: 1.5px solid #25b368;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      outline: none;
+      flex-shrink: 0;
+      color: #000000;
+    }
+
+    .icon-action-btn:active {
+      background: rgba(0, 184, 98, 0.08);
+    }
+
+    .icon-action-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+  </style>
+</head>
+<body>
+
+<div class="mobile-wrapper" id="receiptCard">
+  
+  <!-- Top Animation Video (anim1.mp4) -->
+  <div class="top-animation-wrap">
+    <video src="anim1.mp4" autoplay loop muted playsinline></video>
+  </div>
+
+  <!-- Amount -->
+  <div class="amount-display" id="receiptAmount">Rs. 5.00</div>
+  <div class="success-text">Successfully Sent to</div>
+
+  <!-- Receiver Logo -->
+  <div class="receiver-logo-badge">
+    <img src="raast.png" alt="Receiver Logo" id="receiverLogo">
+  </div>
+
+  <!-- Receiver Name -->
+  <div class="receiver-name" id="receiverName">SHAFQAT ALI AA</div>
+
+  <!-- Masked Account Number -->
+  <div class="receiver-account" id="receiverAccount">PK****************2103</div>
+
+  <!-- Bottom Action Buttons -->
+  <div class="bottom-actions">
+    <a href="index.html" class="back-home-btn">Back to home</a>
+    
+    <!-- Share Button -->
+    <button type="button" class="icon-action-btn" id="shareBtn" title="Share Receipt">
+      <svg viewBox="0 0 24 24">
+        <circle cx="18" cy="5" r="3"></circle>
+        <circle cx="6" cy="12" r="3"></circle>
+        <circle cx="18" cy="19" r="3"></circle>
+        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+      </svg>
+    </button>
+
+    <!-- View Details Button -->
+    <button type="button" class="icon-action-btn" onclick="viewDetails()" title="View Details">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00b862" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="16" y1="13" x2="8" y2="13"></line>
+        <line x1="16" y1="17" x2="8" y2="17"></line>
+        <polyline points="10 9 9 9 8 9"></polyline>
+      </svg>
+    </button>
+  </div>
+
+</div>
+
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    // 1. Set Amount from localStorage
+    const savedAmount = localStorage.getItem('txAmount') || 'Rs. 5.00';
+    document.getElementById('receiptAmount').innerText = savedAmount;
+
+    // 2. Set Receiver Name
+    const recName = localStorage.getItem('recName') || 'SHAFQAT ALI AA';
+    document.getElementById('receiverName').innerText = recName;
+
+    // 3. Set Receiver Bank Logo
+    const recBank = (localStorage.getItem('recBank') || 'Raast').toLowerCase();
+    const logoImg = document.getElementById('receiverLogo');
+    if (recBank.includes('raast')) {
+      logoImg.src = 'raast2.png';
+    } else if (recBank.includes('easypaisa')) {
+      logoImg.src = 'elogo.png';
+    } else {
+      logoImg.src = 'bank2.png';
+    }
+
+    // 4. Account Number Formatting & Masking Conditions
+    const rawAccount = (localStorage.getItem('recAccount') || '03139196058').trim();
+    let formattedAccount = rawAccount;
+
+    if (rawAccount.toUpperCase().startsWith('PK') || rawAccount.length > 16) {
+      if (rawAccount.length >= 4) {
+        const last4 = rawAccount.slice(-4);
+        const middleStars = '*'.repeat(Math.max(0, rawAccount.length - 4));
+        formattedAccount = `PK${middleStars}${last4}`;
+      }
+    } else if (recBank.includes('easypaisa') || recBank.includes('raast') || rawAccount.startsWith('03')) {
+      if (rawAccount.length >= 4) {
+        const last4 = rawAccount.slice(-4);
+        formattedAccount = `+92******${last4}`;
+      }
+    } else {
+      if (rawAccount.length >= 6) {
+        const first2 = rawAccount.slice(0, 2);
+        const last4 = rawAccount.slice(-4);
+        const middleStars = '*'.repeat(Math.max(0, rawAccount.length - 6));
+        formattedAccount = `${first2}${middleStars}${last4}`;
+      }
+    }
+
+    document.getElementById('receiverAccount').innerText = formattedAccount;
+  });
+
+  function viewDetails() {
+    window.location.href = 'receipt.html';
+  }
+
+  document.getElementById('shareBtn').addEventListener('click', () => {
+    const receiptElement = document.getElementById('receiptCard');
+    
+    html2canvas(receiptElement, {
+      scale: 2, 
+      useCORS: true,
+      backgroundColor: null
+    }).then(canvas => {
+      canvas.toBlob(async (blob) => {
+        if (!blob) {
+          alert('Image generation failed.');
+          return;
+        }
+        
+        const file = new File([blob], 'easypaisa-receipt.png', { type: 'image/png' });
+        
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              title: 'Transaction Receipt',
+              text: `Transaction Receipt`,
+              files: [file]
+            });
+          } catch (err) {
+            if (err.name !== 'AbortError') {
+              console.log('Share error:', err);
+            }
+          }
+        } else {
+          alert('Aapke browser mein direct sharing supported nahi hai.');
+        }
+      }, 'image/png');
+    }).catch(err => {
+      console.error('Canvas error:', err);
+      alert('Receipt process nahi ho saki.');
+    });
+  });
+</script>
+
+</body>
+</html>

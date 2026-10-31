@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>easypaisa Transfer</title>
+<style>
+  @font-face {
+    font-family: 'Inter Regular';
+    src: url('Inter_24pt-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; width: 100%; min-height: 100vh; min-height: 100dvh;
+    background-color: #ffffff; font-family: 'Inter Regular', Arial, Helvetica, sans-serif; color: #2e2a36;
+  }
+  .container { max-width: 480px; margin: 0 auto; background: #fff; min-height: 100vh; display: flex; flex-direction: column; }
+  
+  /* Top White Header Area */
+  .top-header-area { padding: 16px 16px 0 16px; background: #fff; }
+  .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .back-btn { width: 36px; height: 36px; border: 1.5px solid #d8deda; border-radius: 10px; background: transparent; display: grid; place-items: center; cursor: pointer; font-size: 18px; }
+  .help-btn { padding: 6px 16px; border: 1.5px solid #d8deda; border-radius: 20px; background: transparent; font-size: 14px; font-weight: 500; cursor: pointer; }
+  h1 { font-size: 26px; font-weight: 700; color: #1a1a1a; margin: 10px 0 16px 0; }
+  .tabs { display: flex; border-bottom: 1.5px solid #e0e0e0; margin-bottom: 0; }
+  .tab { flex: 1; text-align: center; padding-bottom: 12px; font-size: 16px; font-weight: 600; color: #7a7a7a; cursor: pointer; position: relative; }
+  .tab.active { color: #1a1a1a; }
+  .tab.active::after { content: ''; position: absolute; bottom: -1.5px; left: 0; width: 100%; height: 3px; background-color: #128c44; }
+
+  /* Lower Grey Background Area */
+  .lower-content-area { background-color: #f7f8f7; padding: 16px; flex-grow: 1; display: flex; flex-direction: column; }
+  
+  /* Favourites Section */
+  .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .section-title { font-size: 14px; font-weight: 700; color: #1a1a1a; }
+  .see-all { font-size: 14px; font-weight: 600; color: #1a1a1a; cursor: pointer; }
+  
+  .favourites-scroll { display: flex; gap: 16px; overflow-x: auto; padding-top: 6px; padding-bottom: 8px; margin-bottom: 16px; scrollbar-width: none; }
+  .favourites-scroll::-webkit-scrollbar { display: none; }
+  
+  .fav-item { display: flex; flex-direction: column; align-items: center; min-width: 64px; cursor: pointer; position: relative; }
+  .fav-avatar-container { position: relative; width: 56px; height: 56px; }
+  .fav-avatar { width: 100%; height: 100%; border-radius: 50%; border: 1.5px solid #d8deda; display: grid; place-items: center; font-weight: 600; font-size: 15px; color: #1a1a1a; background: #ffffff; }
+  
+  /* 3 Dots Menu Style on Favorites */
+  .fav-dots {
+    position: absolute; top: -4px; right: -4px; width: 20px; height: 20px;
+    background: #ffffff; border: 1px solid #d8deda; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: bold; color: #555; cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 5;
+  }
+  .fav-delete-menu {
+    display: none; position: absolute; top: 22px; right: -10px;
+    background: #ffffff; border: 1px solid #dddddd; border-radius: 6px;
+    padding: 5px 12px; font-size: 12px; font-weight: 600; color: #d9534f;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15); z-index: 20; cursor: pointer; white-space: nowrap;
+  }
+  
+  .fav-name-label { font-size: 11px; text-align: center; color: #333; line-height: 1.2; max-width: 64px; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
+  .fav-subname { font-size: 10px; text-align: center; color: #777; max-width: 64px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .empty-fav { font-size: 13px; color: #888; font-style: italic; margin-bottom: 16px; }
+
+  .type-toggle { display: flex; background: #ffffff; border: 1.5px solid #d8deda; border-radius: 12px; padding: 4px; margin-bottom: 16px; }
+  .toggle-btn { flex: 1; padding: 10px; text-align: center; font-size: 14px; font-weight: 600; border-radius: 10px; cursor: pointer; background: transparent; border: none; color: #555; }
+  .toggle-btn.active { background: #d4ede0; color: #1a1a1a; }
+  
+  .input-box { display: flex; align-items: center; border: 1.5px solid #d8deda; border-radius: 14px; padding: 14px 18px; gap: 12px; margin-bottom: 16px; background: #fff; }
+  .input-box input { border: none; outline: none; width: 100%; font-size: 15px; background: transparent; }
+
+  .next-form-btn { margin-top: 10px; width: 100%; height: 50px; background-color: #25b368; color: white; border: none; border-radius: 25px; font-size: 16px; font-weight: 700; cursor: pointer; }
+
+  /* History View */
+  .history-view { display: none; flex-direction: column; gap: 16px; flex-grow: 1; }
+  .history-view.active { display: flex; }
+  .history-card { background: #e8f7ee; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 10px; position: relative; border: 1px solid #d4ede0; }
+  .history-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .history-user { display: flex; align-items: center; gap: 12px; }
+  .history-avatar { width: 44px; height: 44px; border-radius: 50%; background: #fff; display: grid; place-items: center; font-weight: 600; color: #2e2a36; border: 1px solid #ccc; }
+  .history-details h4 { margin: 0; font-size: 15px; font-weight: 700; color: #1a1a1a; }
+  .history-details p { margin: 2px 0 0 0; font-size: 12px; color: #666; }
+  .menu-dots { cursor: pointer; font-size: 18px; font-weight: bold; color: #555; padding: 4px 8px; }
+  .delete-popup { display: none; position: absolute; right: 16px; top: 40px; background: #fff; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10; padding: 8px 16px; cursor: pointer; color: #d9534f; font-weight: 600; font-size: 13px; }
+  .history-amount { font-size: 24px; font-weight: 700; color: #1a1a1a; padding-left: 56px; }
+  .receipt-btn { margin-left: 56px; padding: 6px 18px; background: transparent; border: 1.5px solid #25b368; border-radius: 16px; font-size: 12px; font-weight: 600; cursor: pointer; color: #1a1a1a; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Top White Header Area -->
+  <div class="top-header-area">
+    <div class="top-bar">
+   <button class="back-btn" onclick="window.location.href='index.html?openSend=true'">
+  <svg width="10" height="14" viewBox="0 0 6 14" fill="none" stroke="#2e2a36" stroke-width="1.5">
+  <path d="M6 1L0 7l6 6"/>
+</svg>
+</button>
+      <button class="help-btn">Help</button>
+    </div>
+
+    <h1>easypaisa Transfer</h1>
+
+    <div class="tabs">
+      <div class="tab active" id="sendMoneyTabBtn" onclick="switchTab('send')">Send Money</div>
+      <div class="tab" id="historyTabBtn" onclick="switchTab('history')">History</div>
+    </div>
+  </div>
+
+  <!-- Lower Grey Background Area -->
+  <div class="lower-content-area">
+    <!-- Send Money View -->
+    <div class="send-money-view active" id="sendMoneyView" style="display: flex; flex-direction: column; flex-grow: 1; min-height: 0;">
+      <div class="section-header">
+        <span class="section-title">My Easypaisa Favourites</span>
+        <span class="see-all" onclick="switchTab('history')">See All</span>
+      </div>
+
+      <div class="favourites-scroll" id="favouritesScrollContainer"></div>
+
+      <div class="type-toggle">
+        <button class="toggle-btn active" type="button" onclick="setTransferType('mobile', this)">Mobile No.</button>
+        <button class="toggle-btn" type="button" onclick="setTransferType('account', this)">Digital Account No.</button>
+      </div>
+
+      <form id="transferForm" onsubmit="goToAmountPage(event)" style="display: flex; flex-direction: column; flex-grow: 1;">
+        <div class="input-box">
+          <svg width="20" height="20" fill="none" stroke="#555" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="receiverName" placeholder="Enter Receiver Name" required>
+        </div>
+
+        <div class="input-box">
+          <input type="text" id="receiverAccount" inputmode="numeric" pattern="[0-9]*" placeholder="Enter Receiver Mobile Number" required>
+        </div>
+
+        <button type="submit" class="next-form-btn">Next</button>
+      </form>
+    </div>
+
+    <!-- History View -->
+    <div class="history-view" id="historyView">
+      <div id="easypaisaHistoryContainer" style="display: flex; flex-direction: column; gap: 14px;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    loadFavourites();
+    loadHistory();
+    const savedTab = localStorage.getItem('activeSendMoneyTab');
+    if (savedTab === 'history') {
+      switchTab('history');
+    }
+  });
+
+  function switchTab(tabName) {
+    const sendTab = document.getElementById('sendMoneyTabBtn');
+    const histTab = document.getElementById('historyTabBtn');
+    const sendView = document.getElementById('sendMoneyView');
+    const histView = document.getElementById('historyView');
+
+    localStorage.setItem('activeSendMoneyTab', tabName);
+
+    if (tabName === 'send') {
+      sendTab.classList.add('active');
+      histTab.classList.remove('active');
+      sendView.style.display = 'flex';
+      histView.classList.remove('active');
+      loadFavourites();
+    } else {
+      histTab.classList.add('active');
+      sendTab.classList.remove('active');
+      histView.classList.add('active');
+      sendView.style.display = 'none';
+      loadHistory();
+    }
+  }
+
+  function setTransferType(type, btn) {
+    document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const accInput = document.getElementById('receiverAccount');
+    if(type === 'mobile') {
+      accInput.placeholder = "Enter Receiver Mobile Number";
+    } else {
+      accInput.placeholder = "Enter Digital Account Number";
+    }
+  }
+
+  function loadFavourites() {
+    const container = document.getElementById('favouritesScrollContainer');
+    let favourites = [];
+    try { favourites = JSON.parse(localStorage.getItem('easypaisaFavorites') || '[]'); } catch(e) { favourites = []; }
+
+    if (favourites.length === 0) {
+      container.innerHTML = '<div class="empty-fav">No favorites yet. Complete a transaction to add favorites automatically.</div>';
+      return;
+    }
+
+    container.innerHTML = '';
+    favourites.forEach((fav, index) => {
+      let initials = fav.name ? fav.name.substring(0,2).toUpperCase() : 'U';
+      let item = document.createElement('div');
+      item.className = 'fav-item';
+      
+      item.innerHTML = `
+        <div class="fav-avatar-container">
+          <div class="fav-avatar">${initials}</div>
+          <div class="fav-dots" onclick="toggleFavDeleteMenu(event, ${index})">⋮</div>
+          <div class="fav-delete-menu" id="favDel_${index}" onclick="deleteFav(event, ${index})">Delete</div>
+        </div>
+        <span class="fav-name-label">${fav.name}</span>
+        <span class="fav-subname">Easypaisa</span>
+      `;
+
+      item.onclick = (e) => {
+        if(e.target.classList.contains('fav-dots') || e.target.classList.contains('fav-delete-menu')) return;
+        localStorage.setItem('recName', fav.name);
+        localStorage.setItem('recAccount', fav.account);
+        localStorage.setItem('recBank', 'Easypaisa');
+        window.location.href = 'amount.html';
+      };
+
+      container.appendChild(item);
+    });
+  }
+
+  function toggleFavDeleteMenu(e, index) {
+    e.stopPropagation();
+    let menu = document.getElementById(`favDel_${index}`);
+    document.querySelectorAll('.fav-delete-menu').forEach(m => { if(m !== menu) m.style.display = 'none'; });
+    menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+  }
+
+  function deleteFav(event, index) {
+    event.stopPropagation();
+    let history = JSON.parse(localStorage.getItem('easypaisaFavorites') || '[]');
+    history.splice(index, 1);
+    localStorage.setItem('easypaisaFavorites', JSON.stringify(history));
+    loadFavourites();
+  }
+
+  function loadHistory() {
+    let container = document.getElementById('easypaisaHistoryContainer');
+    let history = JSON.parse(localStorage.getItem('easypaisaHistory') || '[]');
+    if(history.length === 0) {
+      container.innerHTML = '<div style="text-align:center; color:#777; margin-top:40px;">No transaction history or favorites found.</div>';
+      return;
+    }
+    container.innerHTML = '';
+    history.forEach((tx, index) => {
+      let card = document.createElement('div');
+      card.className = 'history-card';
+      card.innerHTML = `
+        <div class="history-top">
+          <div class="history-user">
+            <div class="history-avatar">${tx.name.substring(0,2).toUpperCase()}</div>
+            <div class="history-details">
+              <h4>${tx.name}</h4>
+              <p>easypaisa • ${tx.account}</p>
+            </div>
+          </div>
+          <div class="menu-dots" onclick="toggleMenu(event, ${index})">⋮</div>
+          <div class="delete-popup" id="delPopup_${index}" onclick="deleteHistoryTx(${index})">Delete</div>
+        </div>
+        <div class="history-amount">Rs. ${tx.amount || '1,000.00'}</div>
+        <div><button class="receipt-btn" onclick='viewReceipt(${JSON.stringify(tx)})'>View Receipt</button></div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  function toggleMenu(e, index) {
+    e.stopPropagation();
+    let popup = document.getElementById(`delPopup_${index}`);
+    document.querySelectorAll('.delete-popup').forEach(p => { if(p !== popup) p.style.display = 'none'; });
+    popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
+  }
+
+  window.onclick = function() {
+    document.querySelectorAll('.delete-popup').forEach(p => p.style.display = 'none');
+    document.querySelectorAll('.fav-delete-menu').forEach(m => m.style.display = 'none');
+  }
+
+  function deleteHistoryTx(index) {
+    let history = JSON.parse(localStorage.getItem('easypaisaHistory') || '[]');
+    history.splice(index, 1);
+    localStorage.setItem('easypaisaHistory', JSON.stringify(history));
+    loadHistory();
+  }
+
+  function viewReceipt(tx) {
+    localStorage.setItem('txId', tx.id || '#57183949805');
+    localStorage.setItem('txDateTime', tx.dateTime || '23 October 2026, 10:14 PM');
+    localStorage.setItem('recName', tx.name);
+    localStorage.setItem('recAccount', tx.account);
+    localStorage.setItem('recBank', tx.bank);
+    localStorage.setItem('txAmount', `Rs. ${tx.amount}`);
+    window.location.href = 'receipt.html';
+  }
+
+  function goToAmountPage(e) {
+    e.preventDefault();
+    const name = document.getElementById('receiverName').value;
+    const account = document.getElementById('receiverAccount').value;
+
+    localStorage.setItem('recName', name);
+    localStorage.setItem('recAccount', account);
+    localStorage.setItem('recBank', 'Easypaisa');
+
+    window.location.href = 'amount.html';
+  }
+</script>
+</body>
+</html>

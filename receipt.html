@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Transaction Successful</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  @font-face {
+    font-family: 'Inter Custom';
+    src: url('Inter_24pt-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+  }
+
+  *, *::before, *::after { 
+    box-sizing: border-box; 
+  }
+  html, body { 
+    margin: 0; 
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+    min-height: 100dvh;
+    background: linear-gradient(180deg, #b9e4cc 0%, #daf1e3 25%, #f0f2f1 55%, #ffffff 100%);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  body {
+    font-family: 'Inter Custom', Arial, Helvetica, sans-serif;
+    color: #2e2a36;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding-top: 4px;
+    padding-bottom: 20px;
+  }
+  .receipt {
+    width: 90%;
+    height: auto;
+    max-width: 420px;
+    margin: auto;
+    padding: 12px 18px 20px;
+    border-radius: 4px;
+    background: linear-gradient(180deg, rgba(242, 255, 248, 0.98) 0%, rgba(245, 248, 246, 0.99) 50%, #ffffff 100%);
+    box-shadow: none;
+  }
+  .success { 
+    text-align: center; 
+    padding-top: 0; 
+  }
+  
+  .logo-container {
+    width: 120px; 
+    height: 80px;
+    margin: 0 auto 18px;
+    display: grid; 
+    place-items: center;
+  }
+  .logo-container img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  h1 {
+    font-size: 24px !important;
+    margin: 40px 0 6px !important;
+    font-weight: 660;
+    color: #24222b;
+  }
+
+  .subtitle {
+    font-size: 16px;
+    color: #55515e;
+    margin: 0 0 18px;
+  }
+
+  .line { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: baseline; 
+    gap: 12px; 
+    margin: 10px 0; 
+    font-size: 14px;
+  }
+  .line .value { 
+    text-align: right; 
+    font-weight: 500; 
+    word-break: break-word; 
+  }
+  
+  .section-title { 
+    font-weight: 700; 
+    font-size: 15px; 
+    color: #3b3742; 
+    margin: 12px 0 6px; 
+  }
+  
+  .rule { 
+    height: 1px; 
+    background: #d8deda; 
+    width: 100%; 
+    margin: 10px 0; 
+  }
+
+  .total { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: baseline; 
+    gap: 12px; 
+    margin: 12px 0; 
+    font-weight: 700; 
+    font-size: 15px;
+  }
+  .total .value { 
+    font-size: 20px; 
+    white-space: nowrap; 
+    color: #000000; 
+  }
+
+  .paid-via { 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    gap: 6px; 
+    margin-top: 24px; 
+    font-size: 13px; 
+    color: #55515e; 
+  }
+  .paid-via-logo-wrap {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-end;
+    line-height: 1;
+  }
+  .paid-via-logo-wrap img {
+    height: 15px;
+    object-fit: contain;
+  }
+  .paid-via-logo-wrap small {
+    font-size: 8px;
+    letter-spacing: -0.2px;
+    color: #333;
+    margin-top: 2px;
+  }
+
+  .action-buttons-container {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 26px;
+  }
+
+  .btn-home {
+    flex: 1;
+    height: 48px;
+    background-color: transparent;
+    border: 1.5px solid #25b368;
+    border-radius: 30px;
+    color: #000000;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: background-color 0.15s, color 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+  }
+  .btn-home:active {
+    background-color: #25b368;
+    color: #ffffff;
+  }
+
+  .btn-circle {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    background-color: transparent;
+    border: 1.5px solid #25b368;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #2e2a36;
+    transition: background-color 0.15s, color 0.15s;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+  }
+  .btn-circle:active {
+    background-color: #25b368;
+    color: #ffffff;
+  }
+  .btn-circle svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  @media (min-width: 768px) {
+    .receipt, .action-buttons-container {
+      max-width: 480px;
+    }
+    .receipt {
+      padding: 28px 24px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<main class="receipt" id="receiptCard">
+  <header class="success">
+    <div class="logo-container">
+      <img src="logo.png" alt="Logo">
+    </div>
+    <h1>Transaction Successful</h1>
+    <p class="subtitle">Money has been sent</p>
+  </header>
+
+  <div class="rule"></div>
+  <section class="details">
+    <div class="line"><span>Transaction ID</span><span class="value" id="txIdDisplay">#57183949805</span></div>
+    <div class="line"><span>Date &amp; Time</span><span class="value" id="txDateTimeDisplay">11 October 2026, 5:23 PM</span></div>
+    <div class="line"><span>Funding Source</span><span class="value">easypaisa Account</span></div>
+  </section>
+
+  <div class="rule"></div>
+  <section class="details section">
+    <div class="section-title">Sent to</div>
+    <div class="line"><span>Name</span><span class="value" id="recNameDisplay">Black Scissor Hair Saloon</span></div>
+    <div class="line"><span>Account Number</span><span class="value" id="recAccountDisplay">03******039</span></div>
+    <div class="line"><span>Bank</span><span class="value" id="recBankDisplay">Easypaisa</span></div>
+    
+    <div class="rule"></div>
+    <div class="section-title">Sent by</div>
+    <div class="line"><span>Name</span><span class="value" id="senderNameDisplay"></span></div>
+    <div class="line"><span>Account Number</span><span class="value" id="senderPhoneDisplay"></span></div>
+    
+    <div class="rule"></div>
+    <div class="section-title">Charges</div>
+    <div class="line"><span>Amount</span><span class="value" id="amountDisplay1">Rs. 1,000.00</span></div>
+    <div class="line"><span>Fee</span><span class="value">Free</span></div>
+    <div class="rule"></div>
+    <div class="total"><span>Total Amount</span><span class="value" id="amountDisplay2">Rs. 1,000.00</span></div>
+    <div class="rule"></div>
+  </section>
+
+  <footer class="paid-via">
+    <span>Paid via</span>
+    <span class="paid-via-logo-wrap">
+      <img src="logo2.png" alt="Paid via Logo">
+      <small>digital bank</small>
+    </span>
+  </footer>
+
+  <div class="action-buttons-container">
+    <a href="index.html" class="btn-home">Back to Home</a>
+    
+    <button class="btn-circle" id="shareBtn" title="Share Receipt">
+      <svg viewBox="0 0 24 24">
+        <circle cx="18" cy="5" r="3"></circle>
+        <circle cx="6" cy="12" r="3"></circle>
+        <circle cx="18" cy="19" r="3"></circle>
+        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+      </svg>
+    </button>
+
+    <button class="btn-circle" id="downloadBtn" title="Download Receipt">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+</main>
+
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+    const savedSetup = JSON.parse(localStorage.getItem('savedUserSetup') || '{}');
+    const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser') || '{}');
+    
+    // Asal name aur phone number set karein
+    const senderName = savedSetup.name || loggedInUser.senderName || loggedInUser.name || 'User';
+    const senderPhone = savedSetup.phone || loggedInUser.senderPhone || loggedInUser.phone || loggedInUser.phoneNumber || 'Number not set';
+
+    // Receipt ke Sender section mein assign karein
+    const senderNameEl = document.getElementById('senderNameDisplay');
+    const senderPhoneEl = document.getElementById('senderPhoneDisplay');
+
+    if (senderNameEl) senderNameEl.innerText = senderName;
+    if (senderPhoneEl) senderPhoneEl.innerText = senderPhone;
+  });
+  document.getElementById('txIdDisplay').innerText = localStorage.getItem('txId') || '#57183949805';
+  document.getElementById('txDateTimeDisplay').innerText = localStorage.getItem('txDateTime') || '11 October 2026, 5:23 PM';
+  document.getElementById('recNameDisplay').innerText = localStorage.getItem('recName') || 'Black Scissor Hair Saloon';
+  document.getElementById('recAccountDisplay').innerText = localStorage.getItem('recAccount') || '03******039';
+  document.getElementById('recBankDisplay').innerText = localStorage.getItem('recBank') || 'Easypaisa';
+  
+  const savedAmount = localStorage.getItem('txAmount') || 'Rs. 1,000.00';
+  document.getElementById('amountDisplay1').innerText = savedAmount;
+  document.getElementById('amountDisplay2').innerText = savedAmount;
+
+  document.getElementById('shareBtn').addEventListener('click', () => {
+    const receiptElement = document.getElementById('receiptCard');
+    
+    html2canvas(receiptElement, {
+      scale: 2, 
+      useCORS: true,
+      backgroundColor: null
+    }).then(canvas => {
+      canvas.toBlob(async (blob) => {
+        if (!blob) {
+          alert('Image generation failed.');
+          return;
+        }
+        
+        const file = new File([blob], 'easypaisa-receipt.png', { type: 'image/png' });
+        
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              title: 'Transaction Receipt',
+              text: `Transaction Receipt of ${savedAmount}`,
+              files: [file]
+            });
+          } catch (err) {
+            if (err.name !== 'AbortError') {
+              console.log('Share error:', err);
+            }
+          }
+        } else if (navigator.share) {
+          try {
+            await navigator.share({
+              title: 'Transaction Receipt',
+              text: `Easypaisa Transaction Successful: ${savedAmount}`
+            });
+          } catch (err) {
+            console.log('Share error:', err);
+          }
+        } else {
+          alert('Aapke browser mein direct sharing supported nahi hai.');
+        }
+      }, 'image/png');
+    }).catch(err => {
+      console.error('Canvas error:', err);
+      alert('Receipt process nahi ho saki.');
+    });
+  });
+
+  document.getElementById('downloadBtn').addEventListener('click', () => {
+    const receiptElement = document.getElementById('receiptCard');
+    
+    html2canvas(receiptElement, {
+      scale: 2, 
+      useCORS: true,
+      backgroundColor: null
+    }).then(canvas => {
+      const link = document.createElement('a');
+      link.download = 'easypaisa-receipt.png';
+      link.href = canvas.toDataURL('image/png');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }).catch(err => {
+      console.error('Download failed:', err); // Fixed console.p typo here
+      alert('Could not generate receipt image. Please try again.');
+    });
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="manifest" href="/eazypaisa/manifest.json">
+  <meta charset="UTF-8">
+  
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  
+  <!-- Firebase Initialization -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAA5fUGbA6MLxNvsENG1jZFeOdnxp-eSkO",
+      authDomain: "eazypaisa-f7418.firebaseapp.com",
+      projectId: "eazypaisa-f7418",
+      storageBucket: "eazypaisa-f7418.firebasestorage.app",
+      messagingSenderId: "702963002169",
+      appId: "1:702963002169:web:3bfc450e50d413e80a16e8",
+      measurementId: "G-WT86SKYXFT"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+  </script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Easypaisa Clone - Home</title>
+<style>
+  @font-face {
+    font-family: 'Inter Custom';
+    src: url('Inter_24pt-Medium.ttf') format('truetype');
+    font-weight: 900;
+    font-style: normal;
+  }
+/* Initial Details Overlay */
+  .details-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh;
+    background: #f4f6f5;
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .details-card {
+    background: #ffffff;
+    width: 100%;
+    max-width: 400px;
+    border-radius: 30px;
+    padding: 30px 24px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    border: 2px solid #d8deda;
+    text-align: center;
+  }
+  .brand-logo-badge {
+    width: 60px; height: 60px;
+    border: 2px solid #d8deda;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: #fff; margin: 0 auto 14px; padding: 4px;
+  }
+  .brand-logo-badge img { width: 100%; height: 100%; object-fit: contain; }
+  .details-card h2 { font-size: 22px; font-weight: 700; color: #1a1a1a; margin-bottom: 6px; }
+  .details-card p { font-size: 13px; color: #555555; margin-bottom: 20px; }
+
+  .input-box { margin-bottom: 14px; text-align: left; }
+  .input-box label { font-size: 12px; color: #444; font-weight: 600; display: block; margin-bottom: 5px; }
+  .input-box input {
+    width: 100%; padding: 12px 16px; border: 2px solid #d8deda;
+    border-radius: 25px; font-size: 14px; outline: none; background: #fff; color: #2e2a36;
+  }
+  .input-box input:focus { border-color: #25b368; }
+
+  .continue-btn {
+    width: 100%; height: 46px; background: #25b368; color: white;
+    border: none; border-radius: 25px; font-size: 16px; font-weight: 700;
+    cursor: pointer; margin-top: 10px;
+  }
+
+  /* PIN Popup Modal Overlay */
+/* PIN Popup Modal Overlay */
+  .pin-modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(0px);
+    z-index: 99990;
+    display: none;
+    align-items: flex-start; /* Center se hata kar ooper align kar diya */
+    justify-content: center;
+    padding-top: 150px; /* Upar se thora faasla diya taake box ooper ho jaye */
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .pin-modal-overlay.active { display: flex; }
+
+.pin-modal-card {
+    background: #ffffff;
+    width: 100%;
+    max-width: 330px; /* Modal ki width thori adjust kar di hai */
+    min-height: 465px; /* Modal ki height adjust kar di hai */
+    border-radius: 24px;
+    padding: 30px 20px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .close-pin-btn {
+    position: absolute;
+    top: 16px; right: 20px;
+    width: 26px; height: 26px;
+    background: #e0e0e0;
+    border-radius: 50%;
+    border: none;
+    font-size: 14px;
+    color: #666;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+
+.lock-icon-graphic {
+    width: 120px;  /* Lock ki width barha di hai (pehle 80px thi) */
+    height: 120px; /* Lock ki height barha di hai */
+    margin: 5px auto 12px; 
+    display: block; 
+    object-fit: contain;
+  }
+
+  .pin-modal-title { font-size: 19px; font-weight: 700; color: #222; margin-bottom: 01px; }
+
+  .pin-input-group { display: flex; justify-content: center; gap: 8px; margin-bottom: 22px; }
+.pin-box {
+  width: 44px; 
+  height: 48px; 
+  border: 1.5px solid #25b368; 
+  border-radius: 10px;
+  background: #fff; 
+  text-align: center; 
+  font-size: 36px; /* Dots ka size bara karne ke liye */
+  font-weight: 800; 
+  color: #575757; 
+  outline: none;
+  -webkit-text-security: disc; /* Yeh text ko foran bina delay ke secure dots mein badal deta hai */
+}
+
+  .proceed-btn {
+    width: 100%; height: 46px; background: #b0b0b0; color: #fff;
+    border: none; border-radius: 23px; font-size: 15px; font-weight: 600; cursor: pointer; margin-bottom: 12px;
+  }
+  .proceed-btn.active-btn { background: #25b368; }
+
+  .forgot-btn-wrap { display: flex; align-items: center; gap: 8px; }
+  .forgot-btn {
+    flex: 1; height: 46px; background: #fff; border: 1px solid #25b368;
+    border-radius: 22px; color: #2e2a36; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .biometric-btn {
+    width: 46px; height: 46px; border-radius: 50%; border: 1px solid #25b368;
+    background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+  body {
+    font-family: 'Inter Custom', sans-serif;
+  }
+
+  :root {
+    --main-font: 'Inter Custom', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --app-bg-color: #f5f5f5;
+    --container-max-width: 450px;
+    --container-padding: 12px 18px;
+    --container-gap: 10px;
+
+    --header-height: 40px;
+    --avatar-size: 38px;
+    --avatar-radius: 50%;
+    --username-size: 15px;
+    --username-weight: 600;
+    --username-color: #1a1a1a;
+    --header-actions-gap: 30px;
+    --header-actions-margin-right: 24px;
+    --icon-btn-size: 20px;
+
+    --cards-gap: 12px;
+    --card-min-width: 73%;
+    --card-height: 250px;
+    --card-border-radius: 15px;
+    --card-padding: 24px;
+    --card-shadow-color: #000000;
+
+    --card1-bg-1: #b0fdb5;
+    --card1-bg-2: #8edab3;
+    --wallet-icon-width: 61px;
+    --wallet-icon-height: 64px;
+    --badge-bg: #65a882;
+    --badge-color: #fdfdfd;
+    --badge-font-size: 11px;
+    --badge-font-weight: 600;
+    --account-title-size: 16px;
+    --account-title-weight: 500;
+    --account-title-color: #353535;
+    --account-title-webkit-text-stroke: 0.4px #353535;
+    --account-title-shift-y: -50px;
+    --global-font-stretch: 100%;
+    
+    --balance-font-family: var(--main-font);
+    --balance-size: 24px;
+    --balance-weight: 500;
+    --balance-color: #353535;
+    --balance-stroke: 1.1px #353535;
+    --balance-letter-spacing: 1px;
+
+    --hide-balance-size: 15px;
+    --hide-balance-weight: 500;
+    --hide-balance-color: #37443d;
+
+    --card2-bg-1: #fff0b6;
+    --card2-bg-2: #e5ce62;
+    --loan-img-size: 55px;
+    --loan-title-size: 13px;
+    --loan-title-weight: 500;
+    --loan-title-color: #353535;
+    --loan-amount-size: 24px;
+    --loan-amount-weight: 600;
+    --loan-amount-color: #353535;
+    --loan-sub-size: 11px;
+    --loan-sub-weight: 400;
+    --loan-sub-color: #53685d;
+
+    --card3-bg-1: #dffeee;
+    --card3-bg-2: #4ef0a0;
+    --card3-title-size: 13px;
+    --card3-title-weight: 500;
+    --card3-title-color: #353535 ;
+    --card3-amount-size: 24px;
+    --card3-amount-weight: 600;
+    --card3-amount-color: #353535;
+    --card3-sub-size: 11px;
+    --card3-sub-weight: 400;
+    --card3-sub-color: #53685d;
+
+    --section-heading-size: 15px;
+    --section-heading-weight: 600;
+    --section-heading-color: #222222;
+    --grid-gap: 8px;
+    --grid-max-height: 237px;
+    --pagination-dot-size: 8px;
+    --pagination-dot-inactive: #d1d1d1;
+    --pagination-dot-active: #25b368;
+
+    --navbar-height: 52px;
+    --navbar-bg: #ffffff;
+    --navbar-border-color: #eaeaea;
+    --navbar-active-color: #25b368;
+    --navbar-inactive-color: #666666;
+    --navbar-font-size: 10px;
+    --navbar-font-weight: 500;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: var(--main-font);
+    font-stretch: var(--global-font-stretch);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    height: 100dvh;
+    overflow-y: auto;
+    background-color: var(--app-bg-color);
+  }
+
+  /* Custom WhatsApp Popup Modal */
+  .modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh;
+    background: rgba(0, 0, 0, 0.4); display: none; align-items: center; justify-content: center; z-index: 100000; padding: 20px;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal-box {
+    background: #ffffff; width: 100%; max-width: 340px; border-radius: 20px; border: 2px solid #d8deda;
+    padding: 24px 20px 20px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    animation: popupAnim 0.25s ease-out; color: #2e2a36;
+  }
+  @keyframes popupAnim {
+    from { transform: scale(0.85); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  .modal-icon {
+    width: 60px; height: 60px; background: #ffffff; border: 2px solid #d8deda; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; padding: 6px;
+  }
+  .modal-title { font-size: 18px; font-weight: 700; color: #1a1a1a; margin-bottom: 8px; }
+  .modal-message { font-size: 14px; color: #555555; line-height: 1.4; margin-bottom: 20px; }
+  .modal-btn {
+    width: 100%; height: 44px; background-color: #25b368; color: #ffffff;
+    border: none; border-radius: 25px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit;
+  }
+
+  .mobile-container {
+    width: 100vw;
+    min-height: 100vh;
+    min-height: 100dvh;
+    max-width: var(--container-max-width);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    position: relative;
+    background-color: var(--app-bg-color);
+    padding: var(--container-padding);
+    gap: var(--container-gap);
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--header-height);
+    flex-shrink: 0;
+  }
+
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .avatar {
+    width: var(--avatar-size);
+    height: var(--avatar-size);
+    border-radius: var(--avatar-radius);
+    object-fit: cover;
+    margin-left: 14px;
+    cursor: pointer;
+  }
+
+  .username {
+    font-size: var(--username-size);
+    font-weight: var(--username-weight);
+    color: var(--username-color);
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--header-actions-gap);
+    margin-right: var(--header-actions-margin-right);
+  }
+
+  .icon-btn {
+    width: var(--icon-btn-size);
+    height: var(--icon-btn-size);
+    object-fit: contain;
+    cursor: pointer;
+  }
+
+  .search-container {
+    width: 95%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .search-bar-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain;
+  }
+
+  .cards-wrapper {
+    display: flex;
+    gap: var(--cards-gap);
+    overflow-x: auto;
+    scrollbar-width: none;
+    flex-shrink: 0;
+    scroll-snap-type: x mandatory;
+  }
+
+  .cards-wrapper::-webkit-scrollbar {
+    display: none;
+  }
+
+  .account-card {
+    min-width: var(--card-min-width);
+    height: var(--card-height);
+    background: linear-gradient(145deg, var(--card1-bg-1) 0%, var(--card1-bg-2) 100%);
+    border-radius: var(--card-border-radius);
+    padding: var(--card-padding);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    box-shadow: 0px 2px 8px #00000010;
+    scroll-snap-align: start;
+    flex-shrink: 0;
+  }
+
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .wallet-icon {
+    width: var(--wallet-icon-width);
+    height: var(--wallet-icon-height);
+    object-fit: contain;
+  }
+
+  .upgrade-badge {
+    background-color: var(--badge-bg);
+    color: var(--badge-color);
+    font-size: var(--badge-font-size);
+    font-weight: var(--badge-font-weight);
+    padding: 5px 14px;
+    border-radius: 20px;
+  }
+
+  .account-title {
+    font-size: var(--account-title-size);
+    font-weight: var(--account-title-weight);
+    color: var(--account-title-color);
+    -webkit-text-stroke: 0.4px var(--account-title-color);
+    transform: translateY(var(--account-title-shift-y));
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .balance-amount {
+    font-family: var(--balance-font-family) !important;
+    font-size: var(--balance-size) !important;
+    font-weight: var(--balance-weight) !important;
+    color: var(--balance-color) !important;
+    -webkit-text-stroke: var(--balance-stroke) !important;
+    letter-spacing: var(--balance-letter-spacing) !important;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .hide-balance {
+    font-size: var(--hide-balance-size);
+    font-weight: var(--hide-balance-weight);
+    color: var(--hide-balance-color);
+    margin-bottom: -8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .loan-card {
+    min-width: var(--card-min-width);
+    height: var(--card-height);
+    background: linear-gradient(120deg, var(--card2-bg-1) 0%, var(--card2-bg-2) 100%);
+    border-radius: var(--card-border-radius);
+    padding: var(--card-padding);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    scroll-snap-align: start;
+    flex-shrink: 0;
+    box-shadow: 0px 2px 8px #00000010;
+  }
+
+  .loan-title {
+    font-size: var(--account-title-size);
+    font-weight: var(--account-title-weight);
+    color: var(--loan-title-color);
+    -webkit-text-stroke: var(--account-title-webkit-text-stroke);
+    transform: translateY(-23px);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .loan-amount {
+    font-family: var(--balance-font-family);
+    font-size: var(--balance-size);
+    font-weight: var(--balance-weight);
+    color: var(--loan-amount-color);
+    -webkit-text-stroke: var(--balance-stroke);
+    letter-spacing: var(--balance-letter-spacing);
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+
+  .loan-sub {
+    font-size: var(--hide-balance-size);
+    font-weight: var(--hide-balance-weight);
+    color: var(--loan-sub-color);
+    margin-bottom: -8px;
+  }
+
+  .debit-card {
+    min-width: var(--card-min-width);
+    height: var(--card-height);
+    background: linear-gradient(145deg, var(--card3-bg-1) 0%, var(--card3-bg-2) 100%);
+    border-radius: var(--card-border-radius);
+    padding: var(--card-padding);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    box-shadow: 0px 2px 8px #00000010;
+    scroll-snap-align: start;
+    flex-shrink: 0;
+  }
+
+  .debit-title {
+    font-size: var(--account-title-size);
+    font-weight: var(--account-title-weight);
+    color: var(--card3-title-color);
+    -webkit-text-stroke: var(--account-title-webkit-text-stroke);
+    transform: translateY(var(--account-title-shift-y));
+  }
+
+  .debit-amount {
+    font-family: var(--balance-font-family);
+    font-size: var(--balance-size);
+    font-weight: var(--balance-weight);
+    color: var(--card3-amount-color);
+    -webkit-text-stroke: var(--balance-stroke);
+    letter-spacing: var(--balance-letter-spacing);
+    margin-bottom: 8px;
+  }
+
+  .debit-sub {
+    font-size: var(--hide-balance-size);
+    font-weight: var(--hide-balance-weight);
+    color: var(--card3-sub-color);
+    margin-bottom: -8px;
+  }
+
+  .services-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex-grow: 1;
+  }
+
+  .section-heading {
+    font-size: var(--section-heading-size);
+    font-weight: var(--section-heading-weight);
+    color: var(--section-heading-color);
+  }
+
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: var(--grid-gap);
+    flex-grow: 1;
+    max-height: var(--grid-max-height);
+  }
+
+  .service-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    cursor: pointer;
+  }
+
+  .pagination-dots {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin-top: 45px;
+  }
+
+  .dot {
+    width: var(--pagination-dot-size);
+    height: var(--pagination-dot-size);
+    border-radius: 50%;
+    background-color: var(--pagination-dot-inactive);
+  }
+
+  .dot.active {
+    background-color: var(--pagination-dot-active);
+  }
+
+  .bottom-navbar {
+    position: fixed;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: var(--container-max-width);
+    height: auto;
+    z-index: 1000;
+    background-color: var(--navbar-bg);
+  }
+
+  .bnb-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain;
+  }
+
+  .balance-icon-img {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    transform: translateY(-1.5px);
+    margin-left: 4px;
+  }
+
+  .hide-icon-img {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    transform: translateY(1px) translateX(-96px);
+  }
+
+  .account-title-img {
+    width: 14px;
+    height: 14px;
+    object-fit: contain;
+    margin-left: 1px;
+    transform: translateY(-1px);
+  }
+.custom-keyboard-box {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #ffffff;
+  padding: 0px 0px 10px 0px; /* Padding kam kar di taake height kam ho */
+  display: none;
+  flex-direction: column;
+  gap: 0px; /* Rows ke darmiyan gap kam kar diya */
+  border-top-left-radius: 14px;
+  border-top-right-radius: 14px;
+  box-shadow: 0 0px 00px rgba(0, 0, 0, 0.0);
+  z-index: 100005;
+  box-sizing: border-box;
+}
+
+.custom-keyboard-box.show {
+  display: flex;
+}
+
+.k-row {
+  display: flex;
+  gap: 0px; /* Buttons ke aapas ka gap kam kar diya */
+  justify-content: space-between;
+}
+
+.k-btn {
+  flex: 1;
+  height: 45px; /* Buttons ki height 50px se kam kar ke 40px kar di */
+  background: #ffffff;
+  border: 0.5px solid #d0d5dd;
+  border-radius: 0px; /* Buttons ka radius kam kar ke 6px kar diya */
+  font-size: 18px; /* Font size bhi buttons ke mutabiq thoda adjust kar diya */
+  font-weight: 600;
+  color: #1d2939;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  outline: none;
+}
+
+.k-btn:active {
+  background: #eaecf0;
+}
+
+.k-action {
+  font-size: 14px;
+  font-weight: 600;
+  background: #ffffff;
+  color: #344054;
+}
+</style>
+</head>
+<body>
+<!-- 1. Initial Setup Overlay (Email, Name, Mobile Number) -->
+<div class="details-overlay" id="detailsOverlay">
+  <div class="details-card">
+    <div class="brand-logo-badge">
+      <img src="elogo.png" alt="easypaisa">
+    </div>
+    <h2>Account Setup</h2>
+    <p>Please enter your details to set up your account</p>
+
+    <form onsubmit="handleInitialDetails(event)">
+      <div class="input-box">
+        <label>Email Address</label>
+        <input type="email" id="userEmailInput" placeholder="Enter your email..." required>
+      </div>
+      <div class="input-box">
+        <label>Username / Name</label>
+        <input type="text" id="userNameInput" placeholder="Enter your full name..." required>
+      </div>
+      <div class="input-box">
+        <label>Mobile Number</label>
+        <input type="tel" id="userPhoneInput" placeholder="03XXXXXXXXX" pattern="[0-9]{11}" inputmode="numeric" maxlength="11" required>
+      </div>
+      <button type="submit" class="continue-btn">Continue</button>
+    </form>
+  </div>
+</div>
+
+<!-- 2. 5-Digit PIN Popup Modal (Background me Home view show hoga) -->
+<!-- 2. 5-Digit PIN Popup Modal -->
+<div class="pin-modal-overlay" id="pinModalOverlay">
+  <div class="pin-modal-card">
+    <button class="close-pin-btn" onclick="closePinModal()">✕</button>
+    
+    <!-- Lock Image -->
+    <img src="lock.png" alt="Lock" class="lock-icon-graphic">
+
+    <div class="pin-modal-title">Enter Your 5 Digit PIN</div>
+
+  <div class="pin-input-group">
+  <input type="password" maxlength="1" class="pin-box" inputmode="none" readonly autocomplete="off">
+  <input type="password" maxlength="1" class="pin-box" inputmode="none" readonly autocomplete="off">
+  <input type="password" maxlength="1" class="pin-box" inputmode="none" readonly autocomplete="off">
+  <input type="password" maxlength="1" class="pin-box" inputmode="none" readonly autocomplete="off">
+  <input type="password" maxlength="1" class="pin-box" inputmode="none" readonly autocomplete="off">
+</div>
+
+    <button class="proceed-btn" id="proceedBtn" onclick="verifyPin()">Proceed</button>
+
+    <div class="forgot-btn-wrap">
+      <button class="forgot-btn" onclick="showPopup('Forgot Password', 'Please contact admin on Whatsapp to reset PIN:<br><strong>0313-9196058</strong>')">Forgot Password</button>
+      <button class="biometric-btn">
+        <img src="fingerprint.png" alt="Fingerprint" style="width: 24px; height: 24px; object-fit: contain;">
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="mobile-container">
+  
+  <div class="header">
+    <div class="user-info">
+      <img src="pp.png" class="avatar" id="appAvatar" alt="User Profile" title="Double click for admin balance">
+      <span class="username" id="displayUsername">Hey There</span>
+    </div>
+    <div class="header-actions">
+      <img src="bell.png" class="icon-btn" alt="Notification">
+      <img src="exit.png" class="icon-btn" alt="Logout" onclick="logoutUser()" title="Logout">
+    </div>
+  </div>
+
+  <div class="search-container">
+    <img src="bar.png" alt="Search or Ask Ello" class="search-bar-img">
+  </div>
+
+  <div class="cards-wrapper">
+    <div class="account-card">
+      <div class="card-top">
+        <img src="card1.png" class="wallet-icon" alt="Wallet Icon">
+        <span class="upgrade-badge">Upgrade</span>
+      </div>
+      <div>
+        <div class="account-title">easypaisa Account <img src="ardn.png" class="account-title-img" alt="ardn"></div>
+        <div class="balance-amount" id="balanceAmountArea">Rs. 50,000.00 <img src="add.png" class="balance-icon-img" alt="Add"></div>
+        <div class="hide-balance"><span>Hide Balance</span> <img src="eye.png" class="hide-icon-img" alt="Eye"></div>
+      </div>
+    </div>
+
+    <div class="loan-card">
+      <div class="loan-top">
+        <img src="card2.png" class="wallet-icon" alt="Borrow Money">
+      </div>
+      <div>
+        <div class="loan-title">Borrow Money</div>
+        <div class="loan-amount">Get up to Rs.<br>50,000</div>
+        <div class="loan-sub">Instant loan with easycash</div>
+      </div>
+    </div>
+
+    <div class="debit-card">
+      <div class="card-top">
+        <img src="card3.png" class="wallet-icon" alt="Card Icon">
+      </div>
+      <div>
+        <div class="debit-title">Debit & Credit Card</div>
+        <div class="debit-amount">Get your Card</div>
+        <div class="debit-sub">Tap to explore and apply</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="services-section">
+    <span class="section-heading">More with easypaisa</span>
+    
+    <div class="grid-container">
+    <img src="Send.png" alt="Send Money" class="service-img" onclick="openSendMoneyModal()" style="cursor: pointer;">
+      <img src="Bill.png" alt="Bill Payment" class="service-img">
+      <img src="Load.png" alt="Loads & Packages" class="service-img">
+      <img src="Enter.png" alt="Enter and Win" class="service-img">
+      <img src="Easy.png" alt="Easycash" class="service-img">
+      <img src="Term.png" alt="Term Deposit" class="service-img">
+      <img src="Insurance.png" alt="Insurance" class="service-img">
+      <img src="Rs.png" alt="Rs. 1 Game" class="service-img">
+      <img src="See.png" alt="See All" class="service-img">
+    </div>
+
+    <div class="pagination-dots">
+      <div class="dot active"></div>
+      <div class="dot"></div>
+    </div>
+  </div>
+
+  <div class="bottom-navbar">
+    <img src="bnb.jfif" alt="Bottom Navigation" class="bnb-img">
+  </div>
+
+</div>
+
+<!-- Custom WhatsApp Popup Modal -->
+<div id="customModal" class="modal-overlay" onclick="closeModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-icon">
+      <img src="elogo.png" alt="Logo" style="width: 100%; height: 100%; object-fit: contain;">
+    </div>
+    <div class="modal-title" id="modalTitle">Notice</div>
+    <div class="modal-message" id="modalMessage">Message content here</div>
+    <button class="modal-btn" onclick="closeModal()">OK</button>
+  </div>
+</div>
+
+<script>
+let activePinIndex = 0;
+
+// 1. Modal khulne par keyboard show karne ke liye openPinModal mein yeh add kar dein:
+function openPinModal() {
+  document.getElementById('pinModalOverlay').classList.add('active');
+  document.getElementById('displayUsername').innerText = "Hey There";
+  const boxes = document.querySelectorAll('.pin-box');
+  boxes.forEach(b => b.value = '');
+  activePinIndex = 0;
+  
+  // Keyboard ko show kar dein
+  document.getElementById('customKeyboard').classList.add('show');
+}
+
+// 2. PIN boxes par click karne par keyboard wapis show karne ke liye:
+document.addEventListener('DOMContentLoaded', () => {
+  const boxes = document.querySelectorAll('.pin-box');
+  boxes.forEach((box, idx) => {
+    box.addEventListener('click', (e) => {
+      e.stopPropagation();
+      activePinIndex = idx;
+      document.getElementById('customKeyboard').classList.add('show');
+    });
+  });
+
+  // 3. Screen ke kisi bhi doosre hissay par click karne par keyboard hide karne ke liye:
+  document.addEventListener('click', (e) => {
+    const keyboard = document.getElementById('customKeyboard');
+    const isClickInsideKeyboard = keyboard.contains(e.target);
+    const isClickOnPinBox = Array.from(boxes).some(b => b.contains(e.target));
+
+    if (!isClickInsideKeyboard && !isClickOnPinBox) {
+      keyboard.classList.remove('show');
+    }
+  });
+});
+
+// 4. Keypad buttons ke functions
+function pressCustomKey(num) {
+  const boxes = document.querySelectorAll('.pin-box');
+  if (activePinIndex < 5) {
+    boxes[activePinIndex].value = num;
+    activePinIndex++;
+    checkPinCompleteCustom();
+  }
+}
+
+function deleteCustomKey() {
+  const boxes = document.querySelectorAll('.pin-box');
+  if (activePinIndex > 0) {
+    if (boxes[activePinIndex].value === '' && activePinIndex > 0) {
+      activePinIndex--;
+    }
+    boxes[activePinIndex].value = '';
+    checkPinCompleteCustom();
+  } else if (activePinIndex === 0 && boxes[0].value !== '') {
+    boxes[0].value = '';
+    checkPinCompleteCustom();
+  }
+}
+
+function submitCustomPin() {
+  const boxes = document.querySelectorAll('.pin-box');
+  let filled = true;
+  boxes.forEach(b => { if(!b.value) filled = false; });
+  
+  if (filled) {
+    verifyPin();
+  } else {
+    showPopup('Incomplete PIN', 'Please enter complete 5 digit PIN');
+  }
+}
+
+function checkPinCompleteCustom() {
+  const boxes = document.querySelectorAll('.pin-box');
+  let allFilled = true;
+  boxes.forEach(b => {
+    if (!b.value || b.value.trim() === '') allFilled = false;
+  });
+
+  const btn = document.getElementById('proceedBtn');
+  if (allFilled) {
+    btn.classList.add('active-btn');
+    setTimeout(() => { verifyPin(); }, 150);
+  } else {
+    btn.classList.remove('active-btn');
+  }
+}
+
+  function showPopup(title, htmlMessage) {
+    document.getElementById('modalTitle').innerText = title;
+    document.getElementById('modalMessage').innerHTML = htmlMessage;
+    document.getElementById('customModal').classList.add('active');
+  }
+
+  function closeModal() {
+    document.getElementById('customModal').classList.remove('active');
+  }
+
+window.addEventListener('DOMContentLoaded', () => {
+    const loggedInUser = localStorage.getItem('loggedInUser');
+    const savedSetup = localStorage.getItem('savedUserSetup');
+
+    if (loggedInUser) {
+      document.getElementById('detailsOverlay').style.display = 'none';
+      document.getElementById('pinModalOverlay').classList.remove('active');
+      renderUserData(JSON.parse(loggedInUser));
+    } else if (savedSetup) {
+      document.getElementById('detailsOverlay').style.display = 'none';
+      const details = JSON.parse(savedSetup);
+      applyBackgroundState(details.name);
+      openPinModal();
+    } else {
+      document.getElementById('detailsOverlay').style.display = 'flex';
+    }
+
+    let savedBalance = localStorage.getItem('userBalance');
+    if (savedBalance === null) {
+      savedBalance = 50000;
+      localStorage.setItem('userBalance', savedBalance);
+    }
+  });
+
+  function handleInitialDetails(e) {
+    e.preventDefault();
+    const email = document.getElementById('userEmailInput').value.trim().toLowerCase();
+    const name = document.getElementById('userNameInput').value.trim();
+    const phone = document.getElementById('userPhoneInput').value.trim();
+
+    if (phone.length !== 11) {
+      showPopup('Error', 'Please enter a valid 11-digit mobile number.');
+      return;
+    }
+
+    db.collection('users').doc(email).get().then((doc) => {
+      if (!doc.exists) {
+        showPopup('Access Denied', 'Email not found in database!<br>Please contact admin on Whatsapp:<br><strong>0313-9196058</strong>');
+        return;
+      }
+      const userData = doc.data();
+      if (userData.isBlocked) {
+        showPopup('Account Blocked', 'Your account has been blocked by Admin!');
+        return;
+      }
+
+      const tempObj = { email, name, phone };
+      localStorage.setItem('tempSetupData', JSON.stringify(tempObj));
+
+      document.getElementById('detailsOverlay').style.display = 'none';
+      applyBackgroundState(name);
+      openPinModal();
+    }).catch((err) => {
+      showPopup('Error', err.message);
+    });
+  }
+
+  function openSendMoneyModal() {
+  document.getElementById('sendMoneyModal').style.display = 'flex';
+}
+
+function closeSendMoneyModal() {
+  document.getElementById('sendMoneyModal').style.display = 'none';
+}
+
+  function applyBackgroundState(name) {
+    document.getElementById('balanceAmountArea').innerText = "Sign in";
+    if (name) {
+      document.getElementById('displayUsername').innerText = name;
+    }
+  }
+
+function openPinModal() {
+  document.getElementById('pinModalOverlay').classList.add('active');
+  document.getElementById('displayUsername').innerText = "Hey There";
+  
+  const boxes = document.querySelectorAll('.pin-box');
+  boxes.forEach(b => b.value = '');
+  activePinIndex = 0;
+  
+  // Modal khulte hi keyboard auto-open ho jaye
+  const keyboard = document.getElementById('customKeyboard');
+  if (keyboard) {
+    keyboard.classList.add('show');
+  }
+
+  checkPinCompleteCustom();
+}
+
+function closePinModal() {
+    document.getElementById('pinModalOverlay').classList.remove('active');
+    document.getElementById('customKeyboard').classList.remove('show');
+  }
+
+  function movePinFocus(current, index) {
+    if (current.value.length > 1) {
+      current.value = current.value.slice(-1);
+    }
+
+    if (current.value.length === 1 && index < 5) {
+      document.querySelectorAll('.pin-box')[index].focus();
+    }
+    checkPinComplete();
+  }
+
+function checkPinComplete() {
+    const boxes = document.querySelectorAll('.pin-box');
+    let allFilled = true;
+    
+    boxes.forEach(b => {
+      if (!b.value || b.value.trim() === '') {
+        allFilled = false;
+      }
+    });
+
+    const btn = document.getElementById('proceedBtn');
+    if (allFilled) {
+      btn.classList.add('active-btn');
+      
+      setTimeout(() => {
+        verifyPin();
+      }, 150);
+    } else {
+      btn.classList.remove('active-btn');
+    }
+  }
+
+  function handlePinKeydown(event, current, index) {
+    if (event.key === 'Backspace') {
+      event.preventDefault();
+      if (current.value !== '') {
+        current.value = '';
+      } else if (index > 1) {
+        const prevBox = document.querySelectorAll('.pin-box')[index - 2];
+        if (prevBox) {
+          prevBox.value = '';
+          prevBox.focus();
+        }
+      }
+      checkPinComplete();
+    }
+  }
+
+  function verifyPin() {
+    const boxes = document.querySelectorAll('.pin-box');
+    let enteredPin = '';
+    boxes.forEach(b => enteredPin += b.value);
+
+    if (enteredPin.length < 5) {
+      showPopup('Invalid PIN', 'Please enter 5-digit PIN');
+      return;
+    }
+
+    const setupObj = JSON.parse(localStorage.getItem('tempSetupData') || localStorage.getItem('savedUserSetup') || '{}');
+    if (!setupObj.email) {
+      localStorage.removeItem('tempSetupData');
+      location.reload();
+      return;
+    }
+
+    db.collection('users').doc(setupObj.email).get().then((doc) => {
+      if (doc.exists) {
+        const user = doc.data();
+        if (String(user.password).trim() === String(enteredPin).trim()) {
+          localStorage.setItem('savedUserSetup', JSON.stringify(setupObj));
+          localStorage.removeItem('tempSetupData');
+
+          user.senderName = setupObj.name;
+          user.senderPhone = setupObj.phone;
+
+          localStorage.setItem('loggedInUser', JSON.stringify(user));
+          localStorage.setItem('userBalance', user.balance);
+
+          document.getElementById('pinModalOverlay').classList.remove('active');
+          document.getElementById('customKeyboard').classList.remove('show'); // Yeh line add karni hai
+          renderUserData(user);
+        } else {
+          showPopup('Invalid PIN', 'Incorrect PIN entered!<br>Please try again or contact admin on Whatsapp:<br><strong>0313-9196058</strong>');
+        }
+      }
+    }).catch((err) => {
+      showPopup('Error', err.message);
+    });
+  }
+
+function renderUserData(user) {
+    const currentBal = Number(user.balance || localStorage.getItem('userBalance') || 50000);
+    let formattedBalance = currentBal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    
+    const balanceEl = document.getElementById('balanceAmountArea');
+    if (balanceEl) {
+      balanceEl.innerHTML = `Rs. ${formattedBalance} <img src="add.png" class="balance-icon-img" alt="Add">`;
+    }
+
+    const savedSetup = JSON.parse(localStorage.getItem('savedUserSetup') || '{}');
+    const finalName = user.senderName || user.name || savedSetup.name;
+    if (finalName) {
+      document.getElementById('displayUsername').innerText = finalName;
+    }
+  }
+
+function logoutUser() {
+    localStorage.removeItem('loggedInUser');
+    document.getElementById('balanceAmountArea').innerText = "Sign in";
+    document.getElementById('displayUsername').innerText = "Hey There";
+    openPinModal();
+    
+    // Keyboard ko force open rakhne ke liye yeh line ensure kar lein
+    const keyboard = document.getElementById('customKeyboard');
+    if (keyboard) {
+      keyboard.classList.add('show');
+    }
+  }
+
+  document.getElementById('appAvatar').addEventListener('dblclick', () => {
+    let adminInput = prompt('Enter new balance for admin recharge:', '50000');
+    if (adminInput !== null && adminInput.trim() !== '') {
+      let updatedAmount = Number(adminInput);
+      if (!isNaN(updatedAmount)) {
+        localStorage.setItem('userBalance', updatedAmount);
+        showPopup('Success', 'Balance successfully updated!');
+        location.reload();
+      }
+    }
+  });
+
+window.addEventListener('DOMContentLoaded', () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('openSend') === 'true') {
+    const sendModal = document.getElementById('sendMoneyModal');
+    if (sendModal) {
+      sendModal.style.display = 'flex';
+      
+      // Yeh line URL se ?openSend=true ko saaf kar degi taake refresh par na khule
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }
+});
+</script>
+
+<!-- Send Money Modal Popup -->
+<div id="sendMoneyModal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+  <div style="background: #f5f5f5; width: 90%; max-width: 400px; border-radius: 20px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); position: relative;">
+    
+    <!-- Close Button -->
+    <span onclick="closeSendMoneyModal()" style="position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #666666;">&times;</span>
+    
+    <h3 style="text-align: center; margin-bottom: 20px; font-family: sans-serif; color: #333333;">Send Money</h3>
+    
+    <!-- Grid Options with Full Box Images (Matching Main Service Grid Style) -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+      
+      <!-- easypaisa -->
+      <img src="easypaisa.png" alt="easypaisa"onclick="window.location.href='easypaisa.html'" style="width: 100%; height: auto; object-fit: contain; cursor: pointer; display: block;">
+
+      <!-- Bank -->
+      <img src="bank.png" alt="Bank" onclick="window.location.href='bank.html'" style="width: 100%; height: auto; object-fit: contain; cursor: pointer; display: block;">
+
+      <!-- Wallet -->
+      <img src="wallet.png" alt="Wallet" onclick="window.location.href='wallet.html'" style="width: 100%; height: auto; object-fit: contain; cursor: pointer; display: block;">
+
+      <!-- Raast -->
+      <img src="raast.png" alt="Raast" onclick="window.location.href='raast.html'" style="width: 100%; height: auto; object-fit: contain; cursor: pointer; display: block;">
+
+      <!-- CNIC (Wallet ke bilkul neechay left align) -->
+      <img src="cnic.png" alt="CNIC" onclick="window.location.href='cnic.html'" style="width: 100%; height: auto; object-fit: contain; cursor: pointer; display: block;">
+
+    </div>
+  </div>
+</div>
+<!-- Standalone Bottom Custom Keyboard -->
+<div id="customKeyboard" class="custom-keyboard-box">
+  <div class="k-row">
+    <button type="button" class="k-btn" onclick="pressCustomKey('1')">1</button>
+    <button type="button" class="k-btn" onclick="pressCustomKey('2')">2</button>
+    <button type="button" class="k-btn" onclick="pressCustomKey('3')">3</button>
+  </div>
+  <div class="k-row">
+    <button type="button" class="k-btn" onclick="pressCustomKey('4')">4</button>
+    <button type="button" class="k-btn" onclick="pressCustomKey('5')">5</button>
+    <button type="button" class="k-btn" onclick="pressCustomKey('6')">6</button>
+  </div>
+  <div class="k-row">
+    <button type="button" class="k-btn" onclick="pressCustomKey('7')">7</button>
+    <button type="button" class="k-btn" onclick="pressCustomKey('8')">8</button>
+    <button type="button" class="k-btn" onclick="pressCustomKey('9')">9</button>
+  </div>
+  <div class="k-row">
+    <button type="button" class="k-btn k-action" onclick="deleteCustomKey()">&lt;<span style="margin-left: 1px; margin-right: 1px;">-</span></button>
+    <button type="button" class="k-btn" onclick="pressCustomKey('0')">0</button>
+    <button type="button" class="k-btn k-action" onclick="submitCustomPin()">DONE</button>
+  </div>
+</div>
+</body>
+</html>
