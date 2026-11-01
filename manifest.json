@@ -1,14 +1,14 @@
 {
-  "name": "easypaisa",
-  "short_name": "App",
-  "start_url": "/eazypaisa/",
+  "name": "easypiasa",
+  "short_name": "easypiasa",
+  "start_url": "/epaisa/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
   "icons": [
     {
-      "src": "/eazypaisa/eplogo.png",
-      "sizes": "192x192",
+      "src": "/epaisa/eplogo.png",
+      "sizes": "512x512",
       "type": "image/png"
     }
   ]
