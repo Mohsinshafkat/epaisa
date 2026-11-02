@@ -2,41 +2,146 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Easypaisa Master Admin Panel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Easypaisa Neumorphic Admin Panel</title>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; }
+  
+  :root {
+    --bg-color: #e0e5ec;
+    --text-color: #3d4852;
+    --shadow-light: #ffffff;
+    --shadow-dark: #a3b1c6;
+    --accent-color: #25b368;
+    --accent-gradient: linear-gradient(145deg, #28c775, #209b57);
+    --danger-color: #ef4444;
+  }
+
   html, body {
     margin: 0; padding: 0; width: 100%; min-height: 100vh;
-    background-color: #f4f6f5; font-family: Arial, sans-serif; color: #2e2a36;
+    background-color: var(--bg-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-color);
   }
-  .login-wrapper { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 16px; }
+
+  /* Neumorphic Shadows */
+  .neu-flat {
+    background: var(--bg-color);
+    box-shadow: 9px 9px 16px var(--shadow-dark), -9px -9px 16px var(--shadow-light);
+    border-radius: 20px;
+  }
+
+  .neu-inset {
+    background: var(--bg-color);
+    box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light);
+    border-radius: 15px;
+  }
+
+  .neu-btn {
+    background: var(--bg-color);
+    box-shadow: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border: none;
+    font-weight: 600;
+  }
+  .neu-btn:active {
+    box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
+    transform: translateY(1px);
+  }
+
+  /* Login Screen */
+  .login-wrapper {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 16px;
+  }
   .login-box {
-    background: #ffffff; width: 100%; max-width: 420px; padding: 36px 28px;
-    border-radius: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); border: 2px solid #d8deda; text-align: center;
+    width: 100%; max-width: 400px; padding: 40px 24px; text-align: center;
   }
+  .login-box h2 { margin-bottom: 8px; font-size: 24px; color: #2d3748; }
+  .login-box p { font-size: 13px; color: #718096; margin-bottom: 24px; }
+
   .input-field {
-    width: 100%; padding: 12px 16px; margin-bottom: 12px; background: #ffffff;
-    border: 2px solid #d8deda; border-radius: 25px; font-size: 14px; outline: none;
+    width: 100%; padding: 14px 18px; margin-bottom: 18px;
+    border: none; outline: none; font-size: 15px; color: var(--text-color);
   }
-  .input-field:focus { border-color: #25b368; }
+
   .btn-primary {
-    width: 100%; height: 44px; background: #25b368; color: #fff;
-    border: none; border-radius: 25px; font-weight: 700; font-size: 15px; cursor: pointer;
+    width: 100%; height: 48px; background: var(--accent-gradient); color: #fff;
+    border-radius: 24px; font-size: 16px; font-weight: 700; cursor: pointer;
+    box-shadow: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
+    border: none; transition: 0.2s;
   }
-  .dashboard { display: none; padding: 20px; max-width: 1200px; margin: 0 auto; }
-  .dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-  .btn-logout { background: #ef4444; color: #fff; border: none; padding: 8px 18px; border-radius: 20px; cursor: pointer; font-weight: 600; }
-  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
-  .stat-card { background: #ffffff; padding: 20px; border-radius: 20px; border: 2px solid #d8deda; }
-  .panel-card { background: #ffffff; border-radius: 20px; border: 2px solid #d8deda; padding: 24px; margin-bottom: 24px; overflow-x: auto; }
-  .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+  .btn-primary:active {
+    box-shadow: inset 3px 3px 6px rgba(0,0,0,0.2);
+  }
+
+  /* Dashboard Layout */
+  .dashboard { display: none; padding: 16px; max-width: 1280px; margin: 0 auto; }
+  
+  .dash-header {
+    display: flex; flex-direction: column; gap: 12px;
+    padding: 20px; margin-bottom: 24px; align-items: flex-start;
+  }
+  @media(min-width: 640px) {
+    .dash-header { flex-direction: row; justify-content: space-between; align-items: center; }
+  }
+
+  .dash-header h2 { font-size: 20px; margin: 0; color: #2d3748; }
+  
+  .btn-logout {
+    background: #ff5252; color: #fff; border: none; padding: 10px 20px;
+    border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 14px;
+    box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light);
+  }
+
+  /* Stats Grid */
+  .stats-grid {
+    display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 24px;
+  }
+  @media(min-width: 550px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media(min-width: 900px) {
+    .stats-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  .stat-card { padding: 20px; text-align: center; }
+  .stat-card div:first-child { color: #718096; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+  .stat-card div:last-child { font-size: 26px; font-weight: 700; color: #2d3748; }
+
+  /* Panel Cards */
+  .panel-card {
+    padding: 20px; margin-bottom: 24px; overflow-x: auto;
+  }
+  .panel-card h3 { margin-top: 0; margin-bottom: 16px; font-size: 17px; color: #2d3748; }
+
+  .form-grid {
+    display: grid; grid-template-columns: 1fr; gap: 12px;
+  }
+  @media(min-width: 768px) {
+    .form-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+  }
+
+  /* Tables Responsive */
+  .table-responsive {
+    width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;
+  }
   table { width: 100%; border-collapse: collapse; text-align: left; min-width: 750px; }
-  th, td { padding: 12px 14px; border-bottom: 1px solid #e0e0e0; font-size: 13.5px; }
-  th { background: #f4f6f5; font-weight: 700; }
-  .btn-sm { padding: 5px 10px; border-radius: 6px; border: none; font-size: 12px; font-weight: 600; cursor: pointer; color: #fff; margin-right: 4px; margin-bottom: 4px; }
+  th, td { padding: 12px 14px; border-bottom: 1px solid rgba(163, 177, 198, 0.4); font-size: 13.5px; }
+  th { background: rgba(163, 177, 198, 0.15); font-weight: 700; color: #4a5568; }
+
+  /* Buttons & Badges */
+  .btn-sm {
+    padding: 6px 12px; border-radius: 10px; border: none; font-size: 12px;
+    font-weight: 600; cursor: pointer; color: #fff; margin-right: 4px; margin-bottom: 4px;
+    box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
+    transition: 0.1s;
+  }
+  .btn-sm:active { box-shadow: inset 2px 2px 4px rgba(0,0,0,0.2); }
+  
   .btn-view { background: #8b5cf6; }
   .btn-edit { background: #0284c7; }
   .btn-recharge { background: #3b82f6; }
@@ -46,98 +151,112 @@
   .btn-demote { background: #64748b; }
   .btn-delete { background: #ef4444; }
 
-  /* Modal Styles */
+  /* Modals */
   .modal-overlay {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-    background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 15px;
+    background: rgba(163, 177, 198, 0.5); backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center; z-index: 10000; padding: 16px;
   }
   .modal-overlay.active { display: flex; }
+  
   .modal-content {
-    background: #fff; width: 100%; max-width: 650px; max-height: 90vh; overflow-y: auto;
-    border-radius: 20px; padding: 24px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    background: var(--bg-color); width: 100%; max-width: 650px; max-height: 90vh;
+    overflow-y: auto; border-radius: 24px; padding: 24px; position: relative;
+    box-shadow: 12px 12px 24px var(--shadow-dark), -12px -12px 24px var(--shadow-light);
   }
-  .close-modal { position: absolute; top: 16px; right: 20px; font-size: 22px; cursor: pointer; color: #888; border: none; background: none; }
-  .badge { padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; color: white; }
+  .close-modal {
+    position: absolute; top: 18px; right: 20px; font-size: 20px; cursor: pointer;
+    color: #555; border: none; background: none; font-weight: bold;
+  }
+  
+  .badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; color: white; display: inline-block; }
   .badge-master { background: #ef4444; }
   .badge-admin { background: #10b981; }
   .badge-user { background: #6b7280; }
+
+  @media(max-width: 480px) {
+    .login-box, .modal-content { padding: 20px 16px; }
+    .dashboard { padding: 8px; }
+  }
 </style>
 </head>
 <body>
 
 <!-- Login Screen -->
 <div class="login-wrapper" id="loginWrapper">
-  <div class="login-box">
-    <h2>Admin Panel Login</h2>
-    <p style="font-size: 13px; color: #666; margin-bottom: 18px;">Login with Master Admin or Sub-Admin Account</p>
+  <div class="login-box neu-flat">
+    <h2>Admin Panel</h2>
+    <p>Sign in with Master or Sub-Admin Account</p>
     <form onsubmit="handleAdminLogin(event)">
-      <input type="text" id="adminUser" class="input-field" placeholder="Mobile / Username" required>
-      <input type="password" id="adminPass" class="input-field" placeholder="PIN / Password" required>
-      <button type="submit" class="btn-primary">Login to Panel</button>
+      <input type="text" id="adminUser" class="input-field neu-inset" placeholder="Mobile / Username" required>
+      <input type="password" id="adminPass" class="input-field neu-inset" placeholder="PIN / Password" required>
+      <button type="submit" class="btn-primary" style="margin-top: 10px;">Login to Panel</button>
     </form>
   </div>
 </div>
 
 <!-- Main Dashboard -->
 <div class="dashboard" id="dashMain">
-  <div class="dash-header">
+  <div class="dash-header neu-flat">
     <div>
-      <h2 id="welcomeTitle">Easypaisa Master Control Panel</h2>
-      <span id="roleBadge" class="badge badge-master">Master Admin</span>
+      <h2 id="welcomeTitle">Easypaisa Control Panel</h2>
+      <span id="roleBadge" class="badge badge-master" style="margin-top: 6px;">Grand Master Admin</span>
     </div>
-    <button class="btn-logout" onclick="logoutAdmin()">Logout</button>
+    <button class="btn-logout neu-btn" onclick="logoutAdmin()">Logout</button>
   </div>
 
   <div class="stats-grid" id="statsArea">
-    <div class="stat-card">
-      <div style="color:#666; font-size:13px;">Total Registered Users</div>
-      <div id="statTotalUsers" style="font-size:24px; font-weight:700;">0</div>
+    <div class="stat-card neu-flat">
+      <div>Total Registered Users</div>
+      <div id="statTotalUsers">0</div>
     </div>
-    <div class="stat-card">
-      <div style="color:#666; font-size:13px;">Total System Balance</div>
-      <div id="statTotalBalance" style="font-size:24px; font-weight:700;">Rs. 0.00</div>
+    <div class="stat-card neu-flat">
+      <div>Total System Balance</div>
+      <div id="statTotalBalance">Rs. 0.00</div>
     </div>
-    <div class="stat-card">
-      <div style="color:#666; font-size:13px;">Total Admins Count</div>
-      <div id="statTotalAdmins" style="font-size:24px; font-weight:700;">0</div>
+    <div class="stat-card neu-flat">
+      <div>Total Admins Count</div>
+      <div id="statTotalAdmins">0</div>
     </div>
   </div>
 
   <!-- Master Admin Only: Create User Form -->
-  <div class="panel-card" id="createUserSection">
+  <div class="panel-card neu-flat" id="createUserSection">
     <h3>+ Create New Account</h3>
     <form onsubmit="createUserInCloud(event)">
       <div class="form-grid">
-        <input type="text" id="addName" class="input-field" placeholder="Full Name" required>
-        <input type="tel" id="addMobile" class="input-field" placeholder="Mobile No. (03XXXXXXXXX)" pattern="[0-9]{11}" maxlength="11" required>
-        <input type="password" id="addPassword" class="input-field" placeholder="5-Digit PIN" maxlength="5" required>
-        <input type="number" id="addBalance" class="input-field" value="50000" required>
-        <select id="addRole" class="input-field">
+        <input type="text" id="addName" class="input-field neu-inset" placeholder="Full Name" required>
+        <input type="tel" id="addMobile" class="input-field neu-inset" placeholder="Mobile (03XXXXXXXXX)" pattern="[0-9]{11}" maxlength="11" required>
+        <input type="password" id="addPassword" class="input-field neu-inset" placeholder="5-Digit PIN" maxlength="5" required>
+        <input type="number" id="addBalance" class="input-field neu-inset" value="50000" required>
+        <select id="addRole" class="input-field neu-inset">
           <option value="user">Role: Standard User</option>
           <option value="admin">Role: Sub-Admin</option>
         </select>
       </div>
-      <button type="submit" class="btn-primary" style="margin-top: 10px; max-width: 200px;">Create Account</button>
+      <button type="submit" class="btn-primary" style="margin-top: 14px; max-width: 200px;">Create Account</button>
     </form>
   </div>
 
   <!-- Users List Section -->
-  <div class="panel-card">
+  <div class="panel-card neu-flat">
     <h3 id="tableHeading">System Accounts Directory</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Mobile</th>
-          <th>PIN</th>
-          <th>Balance</th>
-          <th>Role / Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="userTableBody"></tbody>
-    </table>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Mobile</th>
+            <th>PIN</th>
+            <th>Balance</th>
+            <th>Role / Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="userTableBody"></tbody>
+      </table>
+    </div>
   </div>
 </div>
 
@@ -145,12 +264,12 @@
 <div class="modal-overlay" id="userModal">
   <div class="modal-content">
     <button class="close-modal" onclick="closeUserModal()">✕</button>
-    <h3 id="modalUserName">User Profile & History</h3>
-    <div id="modalUserInfo" style="font-size: 13.5px; margin-bottom: 15px; color: #444; line-height: 1.6;"></div>
+    <h3 id="modalUserName" style="margin-top:0;">User Profile & Activity</h3>
+    <div id="modalUserInfo" style="font-size: 13.5px; margin-bottom: 15px; color: #4a5568; line-height: 1.6;"></div>
     
-    <h4>Transaction History</h4>
-    <div style="overflow-x: auto; margin-top: 10px;">
-      <table style="min-width: 100%;">
+    <h4 style="margin-bottom:8px;">Transaction History</h4>
+    <div class="table-responsive">
+      <table>
         <thead>
           <tr>
             <th>Tx ID</th>
@@ -173,24 +292,24 @@
 <div class="modal-overlay" id="editModal">
   <div class="modal-content" style="max-width: 420px;">
     <button class="close-modal" onclick="closeEditModal()">✕</button>
-    <h3>Edit Account Details</h3>
+    <h3 style="margin-top:0;">Edit Account Details</h3>
     <form onsubmit="saveUserEdits(event)" style="margin-top: 15px;">
       <input type="hidden" id="editDocId">
-      <div class="input-box">
-        <label style="font-size:12px; font-weight:600;">Full Name</label>
-        <input type="text" id="editName" class="input-field" required>
+      <div style="margin-bottom: 12px;">
+        <label style="font-size:12px; font-weight:600; display:block; margin-bottom:4px;">Full Name</label>
+        <input type="text" id="editName" class="input-field neu-inset" required>
       </div>
-      <div class="input-box">
-        <label style="font-size:12px; font-weight:600;">Mobile Number (Account)</label>
-        <input type="text" id="editMobile" class="input-field" maxlength="11" required>
+      <div style="margin-bottom: 12px;">
+        <label style="font-size:12px; font-weight:600; display:block; margin-bottom:4px;">Mobile Number (Account)</label>
+        <input type="text" id="editMobile" class="input-field neu-inset" maxlength="11" required>
       </div>
-      <div class="input-box">
-        <label style="font-size:12px; font-weight:600;">5-Digit PIN</label>
-        <input type="text" id="editPin" class="input-field" maxlength="5" required>
+      <div style="margin-bottom: 12px;">
+        <label style="font-size:12px; font-weight:600; display:block; margin-bottom:4px;">5-Digit PIN</label>
+        <input type="text" id="editPin" class="input-field neu-inset" maxlength="5" required>
       </div>
-      <div class="input-box">
-        <label style="font-size:12px; font-weight:600;">Current Balance (Rs.)</label>
-        <input type="number" id="editBalance" class="input-field" required>
+      <div style="margin-bottom: 12px;">
+        <label style="font-size:12px; font-weight:600; display:block; margin-bottom:4px;">Current Balance (Rs.)</label>
+        <input type="number" id="editBalance" class="input-field neu-inset" required>
       </div>
       <button type="submit" class="btn-primary" style="margin-top: 10px;">Save Updates</button>
     </form>
@@ -210,7 +329,7 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
-  let currentUserRole = 'user'; // 'master', 'admin', 'user'
+  let currentUserRole = 'user';
   let loggedInUserDocId = '';
 
   function handleAdminLogin(e) {
@@ -218,7 +337,6 @@
     const uInput = document.getElementById('adminUser').value.trim();
     const pInput = document.getElementById('adminPass').value.trim();
 
-    // Master / Grand Admin Login Check
     if (uInput === 'admin' && pInput === '123') {
       sessionStorage.setItem('adminRole', 'master');
       sessionStorage.setItem('adminDocId', 'master');
@@ -226,7 +344,6 @@
       return;
     }
 
-    // Sub-Admin Check from Cloud Firestore Database
     db.collection('users').get().then((snapshot) => {
       let foundAdmin = null;
       snapshot.forEach(doc => {
@@ -257,13 +374,13 @@
 
     const roleBadge = document.getElementById('roleBadge');
     if (currentUserRole === 'master') {
-      document.getElementById('welcomeTitle').innerText = "Easypaisa Master Control Panel";
+      document.getElementById('welcomeTitle').innerText = "Master Control Panel";
       roleBadge.innerText = "Grand Master Admin";
       roleBadge.className = "badge badge-master";
       document.getElementById('createUserSection').style.display = 'block';
       document.getElementById('statsArea').style.display = 'grid';
     } else {
-      document.getElementById('welcomeTitle').innerText = "Easypaisa Sub-Admin Self Control";
+      document.getElementById('welcomeTitle').innerText = "Sub-Admin Self Control";
       roleBadge.innerText = "Sub-Admin";
       roleBadge.className = "badge badge-admin";
       document.getElementById('createUserSection').style.display = 'none';
@@ -326,23 +443,22 @@
         totalBal += Number(u.balance || 0);
         count++;
 
-        // Sub-admin restrict check: Sub-admin can only see and edit their OWN record
         if (currentUserRole === 'admin' && docId !== loggedInUserDocId && u.account !== loggedInUserDocId) {
           return;
         }
 
         const tr = document.createElement('tr');
         let actionsHtml = `
-          <button class="btn-sm btn-view" onclick="viewUserProfile('${docId}')">Profile & Tx</button>
-          <button class="btn-sm btn-edit" onclick="openEditModal('${docId}')">Edit</button>
+          <button class="btn-sm btn-view neu-btn" onclick="viewUserProfile('${docId}')">Profile & Tx</button>
+          <button class="btn-sm btn-edit neu-btn" onclick="openEditModal('${docId}')">Edit</button>
         `;
 
         if (currentUserRole === 'master') {
           actionsHtml += `
-            <button class="btn-sm btn-recharge" onclick="rechargeUser('${docId}', ${u.balance || 0})">Recharge</button>
-            <button class="btn-sm ${u.isBlocked ? 'btn-unblock' : 'btn-block'}" onclick="toggleBlock('${docId}', ${!u.isBlocked})">${u.isBlocked ? 'Unblock' : 'Block'}</button>
-            <button class="btn-sm ${isAdminUser ? 'btn-demote' : 'btn-admin'}" onclick="toggleAdminRole('${docId}', ${!isAdminUser})">${isAdminUser ? 'Remove Admin' : 'Make Admin'}</button>
-            <button class="btn-sm btn-delete" onclick="deleteUser('${docId}')">Delete</button>
+            <button class="btn-sm btn-recharge neu-btn" onclick="rechargeUser('${docId}', ${u.balance || 0})">Recharge</button>
+            <button class="btn-sm ${u.isBlocked ? 'btn-unblock' : 'btn-block'} neu-btn" onclick="toggleBlock('${docId}', ${!u.isBlocked})">${u.isBlocked ? 'Unblock' : 'Block'}</button>
+            <button class="btn-sm ${isAdminUser ? 'btn-demote' : 'btn-admin'} neu-btn" onclick="toggleAdminRole('${docId}', ${!isAdminUser})">${isAdminUser ? 'Remove Admin' : 'Make Admin'}</button>
+            <button class="btn-sm btn-delete neu-btn" onclick="deleteUser('${docId}')">Delete</button>
           `;
         }
 
@@ -367,20 +483,18 @@
     });
   }
 
-  // View User Profile & Specific Transactions
   function viewUserProfile(docId) {
     db.collection('users').doc(docId).get().then((doc) => {
       if (!doc.exists) return;
       const u = doc.data();
       document.getElementById('modalUserName').innerText = `${u.name}'s Profile & Activity`;
       document.getElementById('modalUserInfo').innerHTML = `
-        <strong>Account Number:</strong> ${u.account || u.phone || docId} | 
+        <strong>Account:</strong> ${u.account || u.phone || docId} | 
         <strong>PIN:</strong> ${u.password} | 
         <strong>Balance:</strong> Rs. ${Number(u.balance || 0).toLocaleString()} | 
         <strong>Role:</strong> ${u.isAdmin || u.role === 'admin' ? 'Admin' : 'User'}
       `;
 
-      // Fetch user specific transactions
       const txBody = document.getElementById('userTxBody');
       txBody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Loading...</td></tr>';
 
@@ -390,7 +504,6 @@
 
         txSnapshot.forEach(txDoc => {
           const tx = txDoc.data();
-          // Filter transactions matching sender account/phone or name
           if (tx.senderPhone === docId || tx.senderPhone === u.account || tx.senderPhone === u.phone || tx.senderName === u.name) {
             txCount++;
             const tr = document.createElement('tr');
@@ -407,7 +520,7 @@
         });
 
         if (txCount === 0) {
-          txBody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#888;">No transactions found for this user.</td></tr>';
+          txBody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#888;">No transactions found.</td></tr>';
         }
       });
 
@@ -419,7 +532,6 @@
     document.getElementById('userModal').classList.remove('active');
   }
 
-  // Open Edit User Modal
   function openEditModal(docId) {
     db.collection('users').doc(docId).get().then((doc) => {
       if (!doc.exists) return;
@@ -464,7 +576,7 @@
     if (val !== null && val.trim() !== '') {
       const newBal = Number(val);
       if (isNaN(newBal)) {
-        alert('Please enter a valid balance number!');
+        alert('Please enter a valid balance!');
         return;
       }
       db.collection('users').doc(docId).update({ balance: newBal }).then(() => {
