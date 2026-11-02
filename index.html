@@ -24,7 +24,7 @@
   </script>
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>easypiasa</title>
+  <title>easypaisa</title>
 <style>
   @font-face {
     font-family: 'Inter Custom';
@@ -688,32 +688,6 @@
 </style>
 </head>
 <body>
-<!-- 1. Initial Setup Overlay (Email, Name, Mobile Number) -->
-<div class="details-overlay" id="detailsOverlay">
-  <div class="details-card">
-    <div class="brand-logo-badge">
-      <img src="elogo.png" alt="easypaisa">
-    </div>
-    <h2>Account Sign in</h2>
-    <p>Please enter your details to set up your account</p>
-
-    <form onsubmit="handleInitialDetails(event)">
-      <div class="input-box">
-        <label>Email Address</label>
-        <input type="email" id="userEmailInput" placeholder="Enter your email..." required>
-      </div>
-      <div class="input-box">
-        <label>Username / Name</label>
-        <input type="text" id="userNameInput" placeholder="Enter your full name..." required>
-      </div>
-      <div class="input-box">
-        <label>Mobile Number</label>
-        <input type="tel" id="userPhoneInput" placeholder="03XXXXXXXXX" pattern="[0-9]{11}" inputmode="numeric" maxlength="11" required>
-      </div>
-      <button type="submit" class="continue-btn">Continue</button>
-    </form>
-  </div>
-</div>
 
 <!-- 2. 5-Digit PIN Popup Modal (Background me Home view show hoga) -->
 <!-- 2. 5-Digit PIN Popup Modal -->
@@ -737,7 +711,7 @@
     <button class="proceed-btn" id="proceedBtn" onclick="verifyPin()">Proceed</button>
 
     <div class="forgot-btn-wrap">
-      <button class="forgot-btn" onclick="showPopup('Forgot Password', 'Please contact admin on Whatsapp to reset PIN:<br><strong>0313-9196058</strong>')">Forgot Password</button>
+      <button class="forgot-btn" onclick="showPopup('Forgot Password', 'Please contact admin on Whatsapp to reset PIN:<br><strong>0331-5983521</strong>')">Forgot Password</button>
       <button class="biometric-btn">
         <img src="fingerprint.png" alt="Fingerprint" style="width: 24px; height: 24px; object-fit: contain;">
       </button>
@@ -747,10 +721,10 @@
 
 <div class="mobile-container">
   
-  <div class="header">
+<div class="header">
     <div class="user-info">
-      <img src="pp.png" class="avatar" id="appAvatar" alt="User Profile" title="Double click for admin balance">
-      <span class="username" id="displayUsername">Hey There</span>
+      <img src="pp.png" class="avatar" id="appAvatar" alt="User Profile">
+      <span class="username" id="displayUsername" onclick="triggerAuthCheck()">Hey There</span>
     </div>
     <div class="header-actions">
       <img src="bell.png" class="icon-btn" alt="Notification">
@@ -770,8 +744,8 @@
       </div>
       <div>
         <div class="account-title">easypaisa Account <img src="ardn.png" class="account-title-img" alt="ardn"></div>
-        <div class="balance-amount" id="balanceAmountArea">Rs. 50,000.00 <img src="add.png" class="balance-icon-img" alt="Add"></div>
-        <div class="hide-balance"><span>Hide Balance</span> <img src="eye.png" class="hide-icon-img" alt="Eye"></div>
+        <div class="balance-amount" id="balanceAmountArea" onclick="triggerAuthCheck()">Sign In <img src="add.png" class="balance-icon-img" alt="Add"></div>
+        <div class="hide-balance" onclick="toggleBalanceDisplay()"><span>Hide Balance</span> <img src="eye.png" class="hide-icon-img" alt="Eye"></div>
       </div>
     </div>
 
@@ -802,15 +776,15 @@
     <span class="section-heading">More with easypaisa</span>
     
     <div class="grid-container">
-    <img src="Send.png" alt="Send Money" class="service-img" onclick="openSendMoneyModal()" style="cursor: pointer;">
-      <img src="Bill.png" alt="Bill Payment" class="service-img">
-      <img src="Load.png" alt="Loads & Packages" class="service-img">
-      <img src="Enter.png" alt="Enter and Win" class="service-img">
-      <img src="Easy.png" alt="Easycash" class="service-img">
-      <img src="Term.png" alt="Term Deposit" class="service-img">
-      <img src="Insurance.png" alt="Insurance" class="service-img">
-      <img src="Rs.png" alt="Rs. 1 Game" class="service-img">
-      <img src="See.png" alt="See All" class="service-img">
+      <img src="Send.png" alt="Send Money" class="service-img" onclick="checkAuthAndExecute(openSendMoneyModal)">
+      <img src="Bill.png" alt="Bill Payment" class="service-img" onclick="checkAuthAndExecute(() => showPopup('Feature', 'Bill Payment'))">
+      <img src="Load.png" alt="Loads & Packages" class="service-img" onclick="checkAuthAndExecute(() => showPopup('Feature', 'Loads & Packages'))">
+      <img src="Enter.png" alt="Enter and Win" class="service-img" onclick="checkAuthAndExecute(() => showPopup('Feature', 'Enter and Win'))">
+      <img src="Easy.png" alt="Easycash" class="service-img" onclick="checkAuthAndExecute(() => showPopup('Feature', 'Easycash'))">
+      <img src="Term.png" alt="Term Deposit" class="service-img" onclick="checkAuthAndExecute(() => showPopup('Feature', 'Term Deposit'))">
+      <img src="Insurance.png" alt="Insurance" class="service-img" onclick="checkAuthAndExecute(() => showPopup('Feature', 'Insurance'))">
+      <img src="Rs.png" alt="Rs. 1 Game" class="service-img" onclick="checkAuthAndExecute(() => showPopup('Feature', 'Rs. 1 Game'))">
+      <img src="See.png" alt="See All" class="service-img" onclick="checkAuthAndExecute(() => showPopup('Feature', 'See All'))">
     </div>
 
     <div class="pagination-dots">
@@ -938,61 +912,51 @@ function checkPinCompleteCustom() {
   }
 
 window.addEventListener('DOMContentLoaded', () => {
-    const loggedInUser = localStorage.getItem('loggedInUser');
-    const savedSetup = localStorage.getItem('savedUserSetup');
+  const loggedInUser = localStorage.getItem('loggedInUser');
+  const isSessionActive = sessionStorage.getItem('isSessionActive');
 
-    if (loggedInUser) {
-      document.getElementById('detailsOverlay').style.display = 'none';
-      document.getElementById('pinModalOverlay').classList.remove('active');
-      renderUserData(JSON.parse(loggedInUser));
-    } else if (savedSetup) {
-      document.getElementById('detailsOverlay').style.display = 'none';
-      const details = JSON.parse(savedSetup);
-      applyBackgroundState(details.name);
-      openPinModal();
-    } else {
-      document.getElementById('detailsOverlay').style.display = 'flex';
-    }
+  if (loggedInUser && isSessionActive) {
+    isAuthenticated = true;
+    const user = JSON.parse(loggedInUser);
+    renderUserData(user);
+    document.getElementById('pinModalOverlay').classList.remove('active');
+    document.getElementById('customKeyboard').classList.remove('show');
+  } else {
+    localStorage.removeItem('loggedInUser');
+    sessionStorage.removeItem('isSessionActive');
+    applyFreshState();
+    openPinModal();
+  }
 
-    let savedBalance = localStorage.getItem('userBalance');
-    if (savedBalance === null) {
-      savedBalance = 50000;
-      localStorage.setItem('userBalance', savedBalance);
+  const boxes = document.querySelectorAll('.pin-box');
+  boxes.forEach((box, idx) => {
+    box.addEventListener('click', (e) => {
+      e.stopPropagation();
+      activePinIndex = idx;
+      document.getElementById('customKeyboard').classList.add('show');
+    });
+  });
+
+  document.addEventListener('click', (e) => {
+    const keyboard = document.getElementById('customKeyboard');
+    const isClickInsideKeyboard = keyboard.contains(e.target);
+    const isClickOnPinBox = Array.from(boxes).some(b => b.contains(e.target));
+
+    if (!isClickInsideKeyboard && !isClickOnPinBox) {
+      keyboard.classList.remove('show');
     }
   });
 
-  function handleInitialDetails(e) {
-    e.preventDefault();
-    const email = document.getElementById('userEmailInput').value.trim().toLowerCase();
-    const name = document.getElementById('userNameInput').value.trim();
-    const phone = document.getElementById('userPhoneInput').value.trim();
-
-    if (phone.length !== 11) {
-      showPopup('Error', 'Please enter a valid 11-digit mobile number.');
-      return;
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('openSend') === 'true') {
+    const sendModal = document.getElementById('sendMoneyModal');
+    if (sendModal) {
+      sendModal.style.display = 'flex';
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
-
-    db.collection('users').doc(email).get().then((doc) => {
-      if (!doc.exists) {
-        showPopup('Access Denied', 'Email not found in database!<br>Please contact admin on Whatsapp:<br><strong>0313-9196058</strong>');
-        return;
-      }
-      const userData = doc.data();
-      if (userData.isBlocked) {
-        showPopup('Account Blocked', 'Your account has been blocked by Admin!');
-        return;
-      }
-
-      const tempObj = { email, name, phone };
-      localStorage.setItem('tempSetupData', JSON.stringify(tempObj));
-
-      document.getElementById('detailsOverlay').style.display = 'none';
-      applyBackgroundState(name);
-      openPinModal();
-    }).catch((err) => {
-      showPopup('Error', err.message);
-    });
   }
+});
+
 
   function openSendMoneyModal() {
   document.getElementById('sendMoneyModal').style.display = 'flex';
@@ -1027,9 +991,13 @@ function openPinModal() {
 }
 
 function closePinModal() {
-    document.getElementById('pinModalOverlay').classList.remove('active');
-    document.getElementById('customKeyboard').classList.remove('show');
+  document.getElementById('pinModalOverlay').classList.remove('active');
+  document.getElementById('customKeyboard').classList.remove('show');
+
+  if (!isAuthenticated) {
+    applyFreshState();
   }
+}
 
   function movePinFocus(current, index) {
     if (current.value.length > 1) {
@@ -1080,47 +1048,78 @@ function checkPinComplete() {
     }
   }
 
-  function verifyPin() {
-    const boxes = document.querySelectorAll('.pin-box');
-    let enteredPin = '';
-    boxes.forEach(b => enteredPin += b.value);
+function verifyPin() {
+  const boxes = document.querySelectorAll('.pin-box');
+  let enteredPin = '';
+  boxes.forEach(b => enteredPin += b.value);
 
-    if (enteredPin.length < 5) {
-      showPopup('Invalid PIN', 'Please enter 5-digit PIN');
-      return;
-    }
-
-    const setupObj = JSON.parse(localStorage.getItem('tempSetupData') || localStorage.getItem('savedUserSetup') || '{}');
-    if (!setupObj.email) {
-      localStorage.removeItem('tempSetupData');
-      location.reload();
-      return;
-    }
-
-    db.collection('users').doc(setupObj.email).get().then((doc) => {
-      if (doc.exists) {
-        const user = doc.data();
-        if (String(user.password).trim() === String(enteredPin).trim()) {
-          localStorage.setItem('savedUserSetup', JSON.stringify(setupObj));
-          localStorage.removeItem('tempSetupData');
-
-          user.senderName = setupObj.name;
-          user.senderPhone = setupObj.phone;
-
-          localStorage.setItem('loggedInUser', JSON.stringify(user));
-          localStorage.setItem('userBalance', user.balance);
-
-          document.getElementById('pinModalOverlay').classList.remove('active');
-          document.getElementById('customKeyboard').classList.remove('show'); // Yeh line add karni hai
-          renderUserData(user);
-        } else {
-          showPopup('Invalid PIN', 'Incorrect PIN entered!<br>Please try again or contact admin on Whatsapp:<br><strong>0313-9196058</strong>');
-        }
-      }
-    }).catch((err) => {
-      showPopup('Error', err.message);
-    });
+  if (enteredPin.length < 5) {
+    showPopup('Invalid PIN', 'Please enter 5-digit PIN');
+    return;
   }
+
+  db.collection('users').get().then((querySnapshot) => {
+    let matchedUser = null;
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      if (String(data.password).trim() === String(enteredPin).trim()) {
+        matchedUser = data;
+        matchedUser.email = doc.id;
+      }
+    });
+
+    if (matchedUser) {
+      if (matchedUser.isBlocked) {
+        showPopup('Account Blocked', 'Your account has been blocked by Admin!');
+        return;
+      }
+
+      isAuthenticated = true;
+      currentActualBalance = Number(matchedUser.balance || 50000);
+
+      matchedUser.senderName = matchedUser.name;
+      // Agar database mein 'account' ya 'phone' jo bhi naam ho, usay yahan set karein
+      matchedUser.senderPhone = matchedUser.phone || matchedUser.account || matchedUser.phoneNumber || 'Number not set';
+      matchedUser.account = matchedUser.senderPhone;
+      
+      localStorage.setItem('loggedInUser', JSON.stringify(matchedUser));
+      sessionStorage.setItem('isSessionActive', 'true');
+      localStorage.setItem('userBalance', currentActualBalance);
+      localStorage.setItem('loggedInUser', JSON.stringify({
+      name: matchedUser.name,
+      phone: matchedUser.phone || matchedUser.account,
+      account: matchedUser.phone || matchedUser.account,
+      balance: matchedUser.balance
+  }));
+
+      document.getElementById('pinModalOverlay').classList.remove('active');
+      document.getElementById('customKeyboard').classList.remove('show');
+      renderUserData(matchedUser);
+    } else {
+      let userAccount = '0331-5983521';
+      let msgText = encodeURIComponent(`I want to reset PIN, my account number is: ${userAccount}`);
+      let whatsappUrl = `https://wa.me/9203315983521?text=${msgText}`;
+
+      showPopup('Invalid PIN', `
+        Incorrect PIN entered!<br>Please try again or contact admin on Whatsapp:
+        <br><br>
+        <a href="${whatsappUrl}" target="_blank" style="
+          display: inline-block;
+          background-color: #25D366;
+          color: white;
+          padding: 10px 20px;
+          border-radius: 24px;
+          text-decoration: none;
+          font-weight: bold;
+          font-size: 14px;
+          box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
+        ">Chat on WhatsApp</a>
+      `);
+    }
+  }).catch((err) => {
+    showPopup('Error', err.message);
+  });
+}
 
 function renderUserData(user) {
     const currentBal = Number(user.balance || localStorage.getItem('userBalance') || 50000);
@@ -1138,18 +1137,62 @@ function renderUserData(user) {
     }
   }
 
-function logoutUser() {
-    localStorage.removeItem('loggedInUser');
-    document.getElementById('balanceAmountArea').innerText = "Sign in";
-    document.getElementById('displayUsername').innerText = "Hey There";
+  let isAuthenticated = false;
+let isBalanceHidden = false;
+let currentActualBalance = 50000;
+
+function applyFreshState() {
+  isAuthenticated = false;
+  document.getElementById('displayUsername').innerText = "Hey There";
+  document.getElementById('balanceAmountArea').innerHTML = `Sign In <img src="add.png" class="balance-icon-img" alt="Add">`;
+}
+
+function triggerAuthCheck() {
+  if (!isAuthenticated) {
     openPinModal();
-    
-    // Keyboard ko force open rakhne ke liye yeh line ensure kar lein
-    const keyboard = document.getElementById('customKeyboard');
-    if (keyboard) {
-      keyboard.classList.add('show');
-    }
   }
+}
+
+function checkAuthAndExecute(actionCallback) {
+  if (!isAuthenticated) {
+    openPinModal();
+  } else {
+    actionCallback();
+  }
+}
+
+function toggleBalanceDisplay() {
+  if (!isAuthenticated) {
+    openPinModal();
+    return;
+  }
+  isBalanceHidden = !isBalanceHidden;
+  updateBalanceDisplayText();
+}
+
+function updateBalanceDisplayText() {
+  const balanceEl = document.getElementById('balanceAmountArea');
+  if (!balanceEl) return;
+
+  if (isBalanceHidden) {
+    balanceEl.innerHTML = `******** <img src="add.png" class="balance-icon-img" alt="Add">`;
+  } else {
+    let formattedBalance = currentActualBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    balanceEl.innerHTML = `Rs. ${formattedBalance} <img src="add.png" class="balance-icon-img" alt="Add">`;
+  }
+}
+  
+function logoutUser() {
+  localStorage.removeItem('loggedInUser');
+  sessionStorage.removeItem('isSessionActive');
+  applyFreshState();
+  openPinModal();
+  
+  const keyboard = document.getElementById('customKeyboard');
+  if (keyboard) {
+    keyboard.classList.add('show');
+  }
+}
 
 window.addEventListener('DOMContentLoaded', () => {
   const urlParams = new URLSearchParams(window.location.search);
