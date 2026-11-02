@@ -24,7 +24,7 @@
   </script>
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>easypiasa</title>
+  <title>Easypaisa Clone - Home</title>
 <style>
   @font-face {
     font-family: 'Inter Custom';
@@ -1097,7 +1097,7 @@ function checkPinComplete() {
       return;
     }
 
-  db.collection('users').doc(setupObj.email).get().then((doc) => {
+    db.collection('users').doc(setupObj.email).get().then((doc) => {
       if (doc.exists) {
         const user = doc.data();
         if (String(user.password).trim() === String(enteredPin).trim()) {
@@ -1114,31 +1114,13 @@ function checkPinComplete() {
           document.getElementById('customKeyboard').classList.remove('show'); // Yeh line add karni hai
           renderUserData(user);
         } else {
-          // Yahan dynamic WhatsApp link generate kiya hai jo setupObj.phone uthayega
-          let userAccount = setupObj.phone || '03315983521';
-          let msgText = encodeURIComponent(`I want to reset PIN, my account number is: ${userAccount}`);
-          let whatsappUrl = `https://wa.me/923315983521?text=${msgText}`;
-
-          showPopup('Invalid PIN', `
-            Incorrect PIN entered!<br>Please try again or contact admin on Whatsapp:
-            <br><br>
-            <a href="${whatsappUrl}" target="_blank" style="
-              display: inline-block;
-              background-color: #25D366;
-              color: white;
-              padding: 10px 20px;
-              border-radius: 24px;
-              text-decoration: none;
-              font-weight: bold;
-              font-size: 14px;
-              box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
-            ">Chat on WhatsApp</a>
-          `);
+          showPopup('Invalid PIN', 'Incorrect PIN entered!<br>Please try again or contact admin on Whatsapp:<br><strong>0313-9196058</strong>');
         }
       }
     }).catch((err) => {
       showPopup('Error', err.message);
     });
+  }
 
 function renderUserData(user) {
     const currentBal = Number(user.balance || localStorage.getItem('userBalance') || 50000);
@@ -1168,7 +1150,6 @@ function logoutUser() {
       keyboard.classList.add('show');
     }
   }
-
 
 window.addEventListener('DOMContentLoaded', () => {
   const urlParams = new URLSearchParams(window.location.search);
