@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Easypaisa Admin Control Panel - Cloud</title>
+<title>Easypaisa Master Admin Panel</title>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 <style>
@@ -18,114 +18,183 @@
     border-radius: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); border: 2px solid #d8deda; text-align: center;
   }
   .input-field {
-    width: 100%; padding: 14px 18px; margin-bottom: 16px; background: #ffffff;
-    border: 2px solid #d8deda; border-radius: 30px; font-size: 15px; outline: none;
+    width: 100%; padding: 12px 16px; margin-bottom: 12px; background: #ffffff;
+    border: 2px solid #d8deda; border-radius: 25px; font-size: 14px; outline: none;
   }
   .input-field:focus { border-color: #25b368; }
   .btn-primary {
-    width: 100%; height: 48px; background: #25b368; color: #fff;
-    border: none; border-radius: 30px; font-weight: 700; font-size: 16px; cursor: pointer;
+    width: 100%; height: 44px; background: #25b368; color: #fff;
+    border: none; border-radius: 25px; font-weight: 700; font-size: 15px; cursor: pointer;
   }
   .dashboard { display: none; padding: 20px; max-width: 1200px; margin: 0 auto; }
   .dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
   .btn-logout { background: #ef4444; color: #fff; border: none; padding: 8px 18px; border-radius: 20px; cursor: pointer; font-weight: 600; }
-  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
   .stat-card { background: #ffffff; padding: 20px; border-radius: 20px; border: 2px solid #d8deda; }
-  .panel-card { background: #ffffff; border-radius: 20px; border: 2px solid #d8deda; padding: 24px; margin-bottom: 24px; }
-  .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
-  table { width: 100%; border-collapse: collapse; text-align: left; }
-  th, td { padding: 14px 16px; border-bottom: 1px solid #e0e0e0; font-size: 14px; }
+  .panel-card { background: #ffffff; border-radius: 20px; border: 2px solid #d8deda; padding: 24px; margin-bottom: 24px; overflow-x: auto; }
+  .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+  table { width: 100%; border-collapse: collapse; text-align: left; min-width: 750px; }
+  th, td { padding: 12px 14px; border-bottom: 1px solid #e0e0e0; font-size: 13.5px; }
   th { background: #f4f6f5; font-weight: 700; }
-  .btn-sm { padding: 6px 12px; border-radius: 8px; border: none; font-size: 12px; font-weight: 600; cursor: pointer; color: #fff; }
+  .btn-sm { padding: 5px 10px; border-radius: 6px; border: none; font-size: 12px; font-weight: 600; cursor: pointer; color: #fff; margin-right: 4px; margin-bottom: 4px; }
+  .btn-view { background: #8b5cf6; }
+  .btn-edit { background: #0284c7; }
   .btn-recharge { background: #3b82f6; }
   .btn-block { background: #f59e0b; }
   .btn-unblock { background: #25b368; }
+  .btn-admin { background: #10b981; }
+  .btn-demote { background: #64748b; }
   .btn-delete { background: #ef4444; }
+
+  /* Modal Styles */
+  .modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 15px;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal-content {
+    background: #fff; width: 100%; max-width: 650px; max-height: 90vh; overflow-y: auto;
+    border-radius: 20px; padding: 24px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  }
+  .close-modal { position: absolute; top: 16px; right: 20px; font-size: 22px; cursor: pointer; color: #888; border: none; background: none; }
+  .badge { padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; color: white; }
+  .badge-master { background: #ef4444; }
+  .badge-admin { background: #10b981; }
+  .badge-user { background: #6b7280; }
 </style>
 </head>
 <body>
 
+<!-- Login Screen -->
 <div class="login-wrapper" id="loginWrapper">
   <div class="login-box">
-    <h2>Admin Cloud Login</h2>
+    <h2>Admin Panel Login</h2>
+    <p style="font-size: 13px; color: #666; margin-bottom: 18px;">Login with Master Admin or Sub-Admin Account</p>
     <form onsubmit="handleAdminLogin(event)">
-      <input type="text" id="adminUser" class="input-field" placeholder="Admin Username" required>
-      <input type="password" id="adminPass" class="input-field" placeholder="Admin Password" required>
-      <button type="submit" class="btn-primary">Login</button>
+      <input type="text" id="adminUser" class="input-field" placeholder="Mobile / Username" required>
+      <input type="password" id="adminPass" class="input-field" placeholder="PIN / Password" required>
+      <button type="submit" class="btn-primary">Login to Panel</button>
     </form>
   </div>
 </div>
 
+<!-- Main Dashboard -->
 <div class="dashboard" id="dashMain">
   <div class="dash-header">
-    <h2>Easypaisa Admin Cloud Panel</h2>
+    <div>
+      <h2 id="welcomeTitle">Easypaisa Master Control Panel</h2>
+      <span id="roleBadge" class="badge badge-master">Master Admin</span>
+    </div>
     <button class="btn-logout" onclick="logoutAdmin()">Logout</button>
   </div>
 
-  <div class="stats-grid">
+  <div class="stats-grid" id="statsArea">
     <div class="stat-card">
       <div style="color:#666; font-size:13px;">Total Registered Users</div>
       <div id="statTotalUsers" style="font-size:24px; font-weight:700;">0</div>
     </div>
     <div class="stat-card">
-      <div style="color:#666; font-size:13px;">Total User Balance</div>
+      <div style="color:#666; font-size:13px;">Total System Balance</div>
       <div id="statTotalBalance" style="font-size:24px; font-weight:700;">Rs. 0.00</div>
+    </div>
+    <div class="stat-card">
+      <div style="color:#666; font-size:13px;">Total Admins Count</div>
+      <div id="statTotalAdmins" style="font-size:24px; font-weight:700;">0</div>
     </div>
   </div>
 
-  <div class="panel-card">
-    <h3>+ Create New User in Cloud</h3>
+  <!-- Master Admin Only: Create User Form -->
+  <div class="panel-card" id="createUserSection">
+    <h3>+ Create New Account</h3>
     <form onsubmit="createUserInCloud(event)">
       <div class="form-grid">
         <input type="text" id="addName" class="input-field" placeholder="Full Name" required>
-        <input type="text" id="addMobile" class="input-field" placeholder="Mobile No." required>
-        <input type="email" id="addEmail" class="input-field" placeholder="Email (Username)" required>
+        <input type="tel" id="addMobile" class="input-field" placeholder="Mobile No. (03XXXXXXXXX)" pattern="[0-9]{11}" maxlength="11" required>
         <input type="password" id="addPassword" class="input-field" placeholder="5-Digit PIN" maxlength="5" required>
         <input type="number" id="addBalance" class="input-field" value="50000" required>
+        <select id="addRole" class="input-field">
+          <option value="user">Role: Standard User</option>
+          <option value="admin">Role: Sub-Admin</option>
+        </select>
       </div>
-      <button type="submit" class="btn-primary" style="margin-top: 14px; max-width: 200px;">Create User</button>
+      <button type="submit" class="btn-primary" style="margin-top: 10px; max-width: 200px;">Create Account</button>
     </form>
   </div>
 
+  <!-- Users List Section -->
   <div class="panel-card">
-    <h3>Cloud Users Database</h3>
+    <h3 id="tableHeading">System Accounts Directory</h3>
     <table>
       <thead>
         <tr>
-          <th>ID No.</th>
+          <th>ID</th>
           <th>Name</th>
           <th>Mobile</th>
-          <th>Email</th>
           <th>PIN</th>
           <th>Balance</th>
-          <th>Status</th>
+          <th>Role / Status</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody id="userTableBody"></tbody>
     </table>
-    <!-- Export to Excel Button -->
-  <button onclick="exportTableToCSV('transactions.csv')" style="margin: 15px 0; padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">
-    📥 Export to Excel (CSV)
-  </button>
-
-  <table id="adminTable" border="1" style="width:100%; margin-top:10px; border-collapse: collapse; text-align: left;">
-    <thead>
-      <tr style="background: #e8f7ee;">
-        <th style="padding: 10px;">Sender (User)</th>
-        <th style="padding: 10px;">Receiver Name</th>
-        <th style="padding: 10px;">Account Number</th>
-        <th style="padding: 10px;">Bank</th>
-        <th style="padding: 10px;">Amount</th>
-        <th style="padding: 10px;">Date & Time</th>
-      </tr>
-    </thead>
-    <tbody id="adminTableBody">
-      <!-- Data JavaScript se yahan load hoga -->
-    </tbody>
-  </table>
   </div>
+</div>
 
+<!-- User Details & Transaction History Modal -->
+<div class="modal-overlay" id="userModal">
+  <div class="modal-content">
+    <button class="close-modal" onclick="closeUserModal()">✕</button>
+    <h3 id="modalUserName">User Profile & History</h3>
+    <div id="modalUserInfo" style="font-size: 13.5px; margin-bottom: 15px; color: #444; line-height: 1.6;"></div>
+    
+    <h4>Transaction History</h4>
+    <div style="overflow-x: auto; margin-top: 10px;">
+      <table style="min-width: 100%;">
+        <thead>
+          <tr>
+            <th>Tx ID</th>
+            <th>Receiver Name</th>
+            <th>Account No.</th>
+            <th>Bank</th>
+            <th>Date & Time</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody id="userTxBody">
+          <tr><td colspan="6" style="text-align:center;">Loading transactions...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Edit User Details Modal -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal-content" style="max-width: 420px;">
+    <button class="close-modal" onclick="closeEditModal()">✕</button>
+    <h3>Edit Account Details</h3>
+    <form onsubmit="saveUserEdits(event)" style="margin-top: 15px;">
+      <input type="hidden" id="editDocId">
+      <div class="input-box">
+        <label style="font-size:12px; font-weight:600;">Full Name</label>
+        <input type="text" id="editName" class="input-field" required>
+      </div>
+      <div class="input-box">
+        <label style="font-size:12px; font-weight:600;">Mobile Number (Account)</label>
+        <input type="text" id="editMobile" class="input-field" maxlength="11" required>
+      </div>
+      <div class="input-box">
+        <label style="font-size:12px; font-weight:600;">5-Digit PIN</label>
+        <input type="text" id="editPin" class="input-field" maxlength="5" required>
+      </div>
+      <div class="input-box">
+        <label style="font-size:12px; font-weight:600;">Current Balance (Rs.)</label>
+        <input type="number" id="editBalance" class="input-field" required>
+      </div>
+      <button type="submit" class="btn-primary" style="margin-top: 10px;">Save Updates</button>
+    </form>
+  </div>
 </div>
 
 <script>
@@ -141,53 +210,103 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
+  let currentUserRole = 'user'; // 'master', 'admin', 'user'
+  let loggedInUserDocId = '';
+
   function handleAdminLogin(e) {
     e.preventDefault();
-    if (document.getElementById('adminUser').value === 'admin' && document.getElementById('adminPass').value === '123') {
-      sessionStorage.setItem('isAdminLoggedIn', 'true');
+    const uInput = document.getElementById('adminUser').value.trim();
+    const pInput = document.getElementById('adminPass').value.trim();
+
+    // Master / Grand Admin Login Check
+    if (uInput === 'admin' && pInput === '123') {
+      sessionStorage.setItem('adminRole', 'master');
+      sessionStorage.setItem('adminDocId', 'master');
       showDashboard();
-    } else {
-      alert('Invalid Admin Credentials!');
+      return;
     }
+
+    // Sub-Admin Check from Cloud Firestore Database
+    db.collection('users').get().then((snapshot) => {
+      let foundAdmin = null;
+      snapshot.forEach(doc => {
+        const d = doc.data();
+        if ((doc.id === uInput || d.account === uInput || d.phone === uInput) && String(d.password).trim() === pInput) {
+          if (d.isAdmin || d.role === 'admin') {
+            foundAdmin = { docId: doc.id, ...d };
+          }
+        }
+      });
+
+      if (foundAdmin) {
+        sessionStorage.setItem('adminRole', 'admin');
+        sessionStorage.setItem('adminDocId', foundAdmin.docId);
+        showDashboard();
+      } else {
+        alert('Invalid Admin Credentials or Account does not have Admin Privileges!');
+      }
+    }).catch(err => alert('Login Error: ' + err.message));
   }
 
   function showDashboard() {
+    currentUserRole = sessionStorage.getItem('adminRole') || 'user';
+    loggedInUserDocId = sessionStorage.getItem('adminDocId') || '';
+
     document.getElementById('loginWrapper').style.display = 'none';
     document.getElementById('dashMain').style.display = 'block';
+
+    const roleBadge = document.getElementById('roleBadge');
+    if (currentUserRole === 'master') {
+      document.getElementById('welcomeTitle').innerText = "Easypaisa Master Control Panel";
+      roleBadge.innerText = "Grand Master Admin";
+      roleBadge.className = "badge badge-master";
+      document.getElementById('createUserSection').style.display = 'block';
+      document.getElementById('statsArea').style.display = 'grid';
+    } else {
+      document.getElementById('welcomeTitle').innerText = "Easypaisa Sub-Admin Self Control";
+      roleBadge.innerText = "Sub-Admin";
+      roleBadge.className = "badge badge-admin";
+      document.getElementById('createUserSection').style.display = 'none';
+      document.getElementById('statsArea').style.display = 'none';
+    }
+
     loadCloudUsers();
   }
 
   function logoutAdmin() {
-    sessionStorage.removeItem('isAdminLoggedIn');
+    sessionStorage.removeItem('adminRole');
+    sessionStorage.removeItem('adminDocId');
     location.reload();
   }
 
   function createUserInCloud(e) {
     e.preventDefault();
+    if (currentUserRole !== 'master') return;
+
     const name = document.getElementById('addName').value.trim();
     const mobile = document.getElementById('addMobile').value.trim();
-    const email = document.getElementById('addEmail').value.trim().toLowerCase();
     const password = document.getElementById('addPassword').value.trim();
     const balance = Number(document.getElementById('addBalance').value);
+    const role = document.getElementById('addRole').value;
     const userId = Math.floor(100000 + Math.random() * 900000).toString();
 
-    db.collection('users').doc(email).set({
+    db.collection('users').doc(mobile).set({
       id: userId,
       name: name,
       account: mobile,
-      email: email,
+      phone: mobile,
       password: password,
       balance: balance,
       isBlocked: false,
-      avatar: 'avatar.jpeg'
+      isAdmin: (role === 'admin'),
+      role: role,
+      avatar: 'pp.png'
     }).then(() => {
-      alert(`User Created Successfully in Cloud!\nID: #${userId}`);
+      alert(`Account Created Successfully!\nMobile: ${mobile}\nRole: ${role}`);
       e.target.reset();
       document.getElementById('addBalance').value = '50000';
       loadCloudUsers();
-    }).catch(err => {
-      alert('Error: ' + err.message);
-    });
+    }).catch(err => alert('Error: ' + err.message));
   }
 
   function loadCloudUsers() {
@@ -196,77 +315,193 @@
       tbody.innerHTML = '';
       let totalBal = 0;
       let count = 0;
-
-      if (querySnapshot.empty) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No users found in cloud database.</td></tr>';
-      }
+      let adminCount = 0;
 
       querySnapshot.forEach((doc) => {
-        count++;
         const u = doc.data();
-        totalBal += Number(u.balance);
+        const docId = doc.id;
+        const isAdminUser = u.isAdmin || u.role === 'admin';
+
+        if (isAdminUser) adminCount++;
+        totalBal += Number(u.balance || 0);
+        count++;
+
+        // Sub-admin restrict check: Sub-admin can only see and edit their OWN record
+        if (currentUserRole === 'admin' && docId !== loggedInUserDocId && u.account !== loggedInUserDocId) {
+          return;
+        }
 
         const tr = document.createElement('tr');
+        let actionsHtml = `
+          <button class="btn-sm btn-view" onclick="viewUserProfile('${docId}')">Profile & Tx</button>
+          <button class="btn-sm btn-edit" onclick="openEditModal('${docId}')">Edit</button>
+        `;
+
+        if (currentUserRole === 'master') {
+          actionsHtml += `
+            <button class="btn-sm btn-recharge" onclick="rechargeUser('${docId}', ${u.balance || 0})">Recharge</button>
+            <button class="btn-sm ${u.isBlocked ? 'btn-unblock' : 'btn-block'}" onclick="toggleBlock('${docId}', ${!u.isBlocked})">${u.isBlocked ? 'Unblock' : 'Block'}</button>
+            <button class="btn-sm ${isAdminUser ? 'btn-demote' : 'btn-admin'}" onclick="toggleAdminRole('${docId}', ${!isAdminUser})">${isAdminUser ? 'Remove Admin' : 'Make Admin'}</button>
+            <button class="btn-sm btn-delete" onclick="deleteUser('${docId}')">Delete</button>
+          `;
+        }
+
         tr.innerHTML = `
-          <td>#${u.id}</td>
-          <td><strong>${u.name}</strong></td>
-          <td>${u.account}</td>
-          <td>${u.email}</td>
-          <td><code>${u.password}</code></td>
-          <td>Rs. ${Number(u.balance).toLocaleString()}</td>
-          <td>${u.isBlocked ? '<span style="color:red;">Blocked</span>' : '<span style="color:green;">Active</span>'}</td>
+          <td>#${u.id || 'N/A'}</td>
+          <td><strong>${u.name || 'Unnamed'}</strong></td>
+          <td>${u.account || u.phone || docId}</td>
+          <td><code>${u.password || ''}</code></td>
+          <td>Rs. ${Number(u.balance || 0).toLocaleString()}</td>
           <td>
-            <button class="btn-sm btn-recharge" onclick="rechargeUser('${u.email}', ${u.balance})">Recharge</button>
-            <button class="btn-sm ${u.isBlocked ? 'btn-unblock' : 'btn-block'}" onclick="toggleBlock('${u.email}', ${!u.isBlocked})">${u.isBlocked ? 'Unblock' : 'Block'}</button>
-            <button class="btn-sm btn-delete" onclick="deleteUser('${u.email}')">Delete</button>
+            ${isAdminUser ? '<span class="badge badge-admin">Admin</span>' : '<span class="badge badge-user">User</span>'}
+            ${u.isBlocked ? '<span style="color:red; font-weight:bold; margin-left:4px;">Blocked</span>' : ''}
           </td>
+          <td>${actionsHtml}</td>
         `;
         tbody.appendChild(tr);
       });
 
       document.getElementById('statTotalUsers').innerText = count;
+      document.getElementById('statTotalAdmins').innerText = adminCount;
       document.getElementById('statTotalBalance').innerText = 'Rs. ' + totalBal.toLocaleString();
     });
   }
 
-function rechargeUser(email, currentBal) {
-    const val = prompt('Enter new balance:', currentBal);
+  // View User Profile & Specific Transactions
+  function viewUserProfile(docId) {
+    db.collection('users').doc(docId).get().then((doc) => {
+      if (!doc.exists) return;
+      const u = doc.data();
+      document.getElementById('modalUserName').innerText = `${u.name}'s Profile & Activity`;
+      document.getElementById('modalUserInfo').innerHTML = `
+        <strong>Account Number:</strong> ${u.account || u.phone || docId} | 
+        <strong>PIN:</strong> ${u.password} | 
+        <strong>Balance:</strong> Rs. ${Number(u.balance || 0).toLocaleString()} | 
+        <strong>Role:</strong> ${u.isAdmin || u.role === 'admin' ? 'Admin' : 'User'}
+      `;
+
+      // Fetch user specific transactions
+      const txBody = document.getElementById('userTxBody');
+      txBody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Loading...</td></tr>';
+
+      db.collection('transactions').get().then((txSnapshot) => {
+        txBody.innerHTML = '';
+        let txCount = 0;
+
+        txSnapshot.forEach(txDoc => {
+          const tx = txDoc.data();
+          // Filter transactions matching sender account/phone or name
+          if (tx.senderPhone === docId || tx.senderPhone === u.account || tx.senderPhone === u.phone || tx.senderName === u.name) {
+            txCount++;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>#${tx.txId || txDoc.id}</td>
+              <td><strong>${tx.receiverName || tx.recName || 'N/A'}</strong></td>
+              <td>${tx.receiverAccount || tx.recAccount || 'N/A'}</td>
+              <td>${tx.bank || tx.recBank || 'Easypaisa'}</td>
+              <td>${tx.dateTime || tx.date || 'N/A'}</td>
+              <td style="color:green; font-weight:bold;">Rs. ${Number(tx.amount || 0).toLocaleString()}</td>
+            `;
+            txBody.appendChild(tr);
+          }
+        });
+
+        if (txCount === 0) {
+          txBody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#888;">No transactions found for this user.</td></tr>';
+        }
+      });
+
+      document.getElementById('userModal').classList.add('active');
+    });
+  }
+
+  function closeUserModal() {
+    document.getElementById('userModal').classList.remove('active');
+  }
+
+  // Open Edit User Modal
+  function openEditModal(docId) {
+    db.collection('users').doc(docId).get().then((doc) => {
+      if (!doc.exists) return;
+      const u = doc.data();
+      document.getElementById('editDocId').value = docId;
+      document.getElementById('editName').value = u.name || '';
+      document.getElementById('editMobile').value = u.account || u.phone || docId;
+      document.getElementById('editPin').value = u.password || '';
+      document.getElementById('editBalance').value = u.balance || 0;
+
+      document.getElementById('editModal').classList.add('active');
+    });
+  }
+
+  function closeEditModal() {
+    document.getElementById('editModal').classList.remove('active');
+  }
+
+  function saveUserEdits(e) {
+    e.preventDefault();
+    const oldDocId = document.getElementById('editDocId').value;
+    const name = document.getElementById('editName').value.trim();
+    const mobile = document.getElementById('editMobile').value.trim();
+    const pin = document.getElementById('editPin').value.trim();
+    const balance = Number(document.getElementById('editBalance').value);
+
+    db.collection('users').doc(oldDocId).update({
+      name: name,
+      account: mobile,
+      phone: mobile,
+      password: pin,
+      balance: balance
+    }).then(() => {
+      alert('User details updated successfully!');
+      closeEditModal();
+      loadCloudUsers();
+    }).catch(err => alert('Error: ' + err.message));
+  }
+
+  function rechargeUser(docId, currentBal) {
+    const val = prompt('Enter new balance amount (Rs.):', currentBal);
     if (val !== null && val.trim() !== '') {
       const newBal = Number(val);
       if (isNaN(newBal)) {
-        alert('Please enter a valid number!');
+        alert('Please enter a valid balance number!');
         return;
       }
-
-      db.collection('users').doc(email).update({ 
-        balance: newBal 
-      }).then(() => {
-        alert('Balance updated successfully in Cloud!');
-        loadCloudUsers(); // Table refresh karne ke liye
-      }).catch(err => {
-        alert('Error: ' + err.message);
+      db.collection('users').doc(docId).update({ balance: newBal }).then(() => {
+        alert('Balance updated!');
+        loadCloudUsers();
       });
     }
   }
 
-  function toggleBlock(email, status) {
-    db.collection('users').doc(email).update({ isBlocked: status }).then(() => {
-      alert('Status updated!');
+  function toggleBlock(docId, status) {
+    db.collection('users').doc(docId).update({ isBlocked: status }).then(() => {
+      alert('User block status updated!');
       loadCloudUsers();
     });
   }
 
-  function deleteUser(email) {
-    if (confirm('Delete this user?')) {
-      db.collection('users').doc(email).delete().then(() => {
-        alert('User deleted!');
+  function toggleAdminRole(docId, makeAdmin) {
+    db.collection('users').doc(docId).update({
+      isAdmin: makeAdmin,
+      role: makeAdmin ? 'admin' : 'user'
+    }).then(() => {
+      alert(`User role updated to ${makeAdmin ? 'Sub-Admin' : 'Standard User'}!`);
+      loadCloudUsers();
+    });
+  }
+
+  function deleteUser(docId) {
+    if (confirm('Are you sure you want to permanently delete this account?')) {
+      db.collection('users').doc(docId).delete().then(() => {
+        alert('Account deleted!');
         loadCloudUsers();
       });
     }
   }
 
   window.onload = function() {
-    if (sessionStorage.getItem('isAdminLoggedIn') === 'true') {
+    if (sessionStorage.getItem('adminRole')) {
       showDashboard();
     }
   };
