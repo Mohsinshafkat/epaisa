@@ -7,9 +7,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
     :root {
-        --top: #c2f2db;       /* Top Light Green */
-        --left: #c9f2dc;      /* Left Mint Green */
-        --right: #D9F5E7;     /* Right Mint Green */
+        --top: #bfeed8;       /* Top Light Green */
+        --left: #d0f2e1;      /* Left Mint Green */
+        --right: #d0f2e1;     /* Right Mint Green */
         --mod: #E2F8EC;       /* Middle Soft Green */
         --bottom: #FCFEFD;    /* Bottom White / Fade */
     }
@@ -65,13 +65,13 @@
       margin-bottom: 25px;
     }
 
-    .top-animation-wrap video {
-      width: 220%;
-      height: 220%;
-      margin-top: 56px;
-      object-fit: contain;
-      border-radius: 50%;
-    }
+.top-animation-wrap img {
+  width: 220%;
+  height: 220%;
+  margin-top: 56px;
+  object-fit: contain;
+  border-radius: 50%;
+}
 
     /* Amount Display */
     .amount-display {
@@ -92,8 +92,8 @@
 
     /* Receiver Logo Badge */
     .receiver-logo-badge {
-      width: 52px;
-      height: 52px;
+      width: 68px;
+      height: 68px;
       background: #ffffff;
       border: 1px solid #d4ded7;
       border-radius: 50%;
@@ -113,15 +113,15 @@
 
     /* Receiver Details */
     .receiver-name {
-      font-size: 16px;
-      font-weight: 700;
+      font-size: 22px;
+      font-weight: 500;
       color: #1a1a1a;
       margin-bottom: 6px;
       letter-spacing: 0.2px;
     }
 
     .receiver-account {
-      font-size: 13.5px;
+      font-size: 16px;
       font-weight: 500;
       color: #586960;
       letter-spacing: 0.5px;
@@ -192,10 +192,10 @@
 
 <div class="mobile-wrapper" id="receiptCard">
   
-  <!-- Top Animation Video (anim1.mp4) -->
-  <div class="top-animation-wrap">
-    <video src="anim1.mp4" autoplay loop muted playsinline></video>
-  </div>
+  <!-- Top Animation Gif (anim1.gif) -->
+ <div class="top-animation-wrap">
+  <img src="anim1.gif" alt="Animation">
+</div>
 
   <!-- Amount -->
   <div class="amount-display" id="receiptAmount">Rs. 5.00</div>
@@ -322,12 +322,12 @@
             }
           }
         } else {
-          alert('Aapke browser mein direct sharing supported nahi hai.');
+          alert('Your device does not support sharing files.');
         }
       }, 'image/png');
     }).catch(err => {
       console.error('Canvas error:', err);
-      alert('Receipt process nahi ho saki.');
+      alert('Failed to generate receipt image.');
     });
   });
 </script>
