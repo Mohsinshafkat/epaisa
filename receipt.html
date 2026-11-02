@@ -42,7 +42,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: linear-gradient(180deg, #89c7a5 0%, #daf1e3 25%, #f0f2f1 55%, #ffffff 100%);
+    background: linear-gradient(180deg, #89af9a 0%, #daf1e3 25%, #f0f2f1 55%, #ffffff 100%);
     padding-top: 20px; 
     padding-bottom: 20px;
   }
@@ -308,14 +308,16 @@ window.addEventListener('DOMContentLoaded', () => {
     const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser') || '{}');
     
     const senderName = savedSetup.name || loggedInUser.senderName || loggedInUser.name || 'User';
-    const senderPhone = savedSetup.phone || loggedInUser.senderPhone || loggedInUser.phone || loggedInUser.phoneNumber || 'Number not set';
+    
+    // Yahan multiple keys check kar li hain taake number miss na ho
+    const senderPhone = savedSetup.phone || savedSetup.account || loggedInUser.phone || loggedInUser.account || loggedInUser.phoneNumber || loggedInUser.senderPhone || 'Number not set';
 
     const senderNameEl = document.getElementById('senderNameDisplay');
     const senderPhoneEl = document.getElementById('senderPhoneDisplay');
 
     if (senderNameEl) senderNameEl.innerText = senderName;
     if (senderPhoneEl) senderPhoneEl.innerText = senderPhone;
-  });
+});
 
   document.getElementById('txIdDisplay').innerText = localStorage.getItem('txId') || '#57183949805';
   document.getElementById('txDateTimeDisplay').innerText = localStorage.getItem('txDateTime') || '11 October 2026, 5:23 PM';
