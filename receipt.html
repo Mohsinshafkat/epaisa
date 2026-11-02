@@ -8,8 +8,8 @@
 <style>
   @font-face {
     font-family: 'Inter Custom';
-    src: url('Inter_24pt-Medium.ttf') format('truetype');
-    font-weight: 500;
+    src: url('Inter_28pt-Medium.ttf') format('truetype');
+    font-weight: 600;
     font-style: normal;
   }
 
@@ -20,11 +20,11 @@
     margin: 0; 
     padding: 0;
     width: 100%;
-    min-height: 100%;
-    min-height: 100dvh;
+    height: 100%;
     background: linear-gradient(180deg, #b9e4cc 0%, #daf1e3 25%, #f0f2f1 55%, #ffffff 100%);
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
+    overflow-y: auto;
   }
   body {
     font-family: 'Inter Custom', Arial, Helvetica, sans-serif;
@@ -33,17 +33,28 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    padding-top: 4px;
+    padding: 0; /* Body padding zero kar di hai taaki wrapper proper area cover kare */
+  }
+
+  /* Full screen background capture wrapper (Yahan padding-top shift kar di hai taaki image mein capture ho) */
+  .page-bg-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: linear-gradient(180deg, #89c7a5 0%, #daf1e3 25%, #f0f2f1 55%, #ffffff 100%);
+    padding-top: 20px; 
     padding-bottom: 20px;
   }
+
   .receipt {
     width: 90%;
     height: auto;
     max-width: 420px;
-    margin: auto;
+    margin: 0 auto;
     padding: 12px 18px 20px;
     border-radius: 4px;
-    background: linear-gradient(180deg, rgba(242, 255, 248, 0.98) 0%, rgba(245, 248, 246, 0.99) 50%, #ffffff 100%);
+    background: linear-gradient(180deg, rgba(242, 255, 248, 0.664) 0%, rgba(245, 248, 246, 0.596) 50%, #ffffff 100%);
     box-shadow: none;
   }
   .success { 
@@ -65,9 +76,9 @@
   }
 
   h1 {
-    font-size: 24px !important;
+    font-size: 22px !important;
     margin: 40px 0 6px !important;
-    font-weight: 660;
+    font-weight: 600;
     color: #24222b;
   }
 
@@ -83,7 +94,7 @@
     align-items: baseline; 
     gap: 12px; 
     margin: 10px 0; 
-    font-size: 14px;
+    font-size: 14.2px;
   }
   .line .value { 
     text-align: right; 
@@ -122,10 +133,11 @@
 
   .paid-via { 
     display: flex; 
-    align-items: center; 
+    align-items: baseline; 
     justify-content: center; 
     gap: 6px; 
-    margin-top: 24px; 
+    margin-top: 16px; 
+    margin-bottom: -30px; 
     font-size: 13px; 
     color: #55515e; 
   }
@@ -147,13 +159,14 @@
   }
 
   .action-buttons-container {
-    width: 100%;
+    width: 90%;
     max-width: 420px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    margin-top: 26px;
+    margin-top: 10px;
+    margin-bottom: 10px;
   }
 
   .btn-home {
@@ -221,88 +234,89 @@
 </head>
 <body>
 
-<main class="receipt" id="receiptCard">
-  <header class="success">
-    <div class="logo-container">
-      <img src="logo.png" alt="Logo">
-    </div>
-    <h1>Transaction Successful</h1>
-    <p class="subtitle">Money has been sent</p>
-  </header>
+<div class="page-bg-wrapper" id="captureArea">
+  <main class="receipt" id="receiptCard">
+    <header class="success">
+      <div class="logo-container">
+        <img src="logo.png" alt="Logo">
+      </div>
+      <h1>Transaction Successful</h1>
+      <p class="subtitle">Money has been sent</p>
+    </header>
 
-  <div class="rule"></div>
-  <section class="details">
-    <div class="line"><span>Transaction ID</span><span class="value" id="txIdDisplay">#57183949805</span></div>
-    <div class="line"><span>Date &amp; Time</span><span class="value" id="txDateTimeDisplay">11 October 2026, 5:23 PM</span></div>
-    <div class="line"><span>Funding Source</span><span class="value">easypaisa Account</span></div>
-  </section>
-
-  <div class="rule"></div>
-  <section class="details section">
-    <div class="section-title">Sent to</div>
-    <div class="line"><span>Name</span><span class="value" id="recNameDisplay">Black Scissor Hair Saloon</span></div>
-    <div class="line"><span>Account Number</span><span class="value" id="recAccountDisplay">03******039</span></div>
-    <div class="line"><span>Bank</span><span class="value" id="recBankDisplay">Easypaisa</span></div>
-    
     <div class="rule"></div>
-    <div class="section-title">Sent by</div>
-    <div class="line"><span>Name</span><span class="value" id="senderNameDisplay"></span></div>
-    <div class="line"><span>Account Number</span><span class="value" id="senderPhoneDisplay"></span></div>
-    
-    <div class="rule"></div>
-    <div class="section-title">Charges</div>
-    <div class="line"><span>Amount</span><span class="value" id="amountDisplay1">Rs. 1,000.00</span></div>
-    <div class="line"><span>Fee</span><span class="value">Free</span></div>
-    <div class="rule"></div>
-    <div class="total"><span>Total Amount</span><span class="value" id="amountDisplay2">Rs. 1,000.00</span></div>
-    <div class="rule"></div>
-  </section>
+    <section class="details">
+      <div class="line"><span>Transaction ID</span><span class="value" id="txIdDisplay">#57183949805</span></div>
+      <div class="line"><span>Date &amp; Time</span><span class="value" id="txDateTimeDisplay">11 October 2026, 5:23 PM</span></div>
+      <div class="line"><span>Funding Source</span><span class="value">easypaisa Account</span></div>
+    </section>
 
-  <footer class="paid-via">
-    <span>Paid via</span>
-    <span class="paid-via-logo-wrap">
-      <img src="logo2.png" alt="Paid via Logo">
-      <small>digital bank</small>
-    </span>
-  </footer>
+    <div class="rule"></div>
+    <section class="details section">
+      <div class="section-title">Sent to</div>
+      <div class="line"><span>Name</span><span class="value" id="recNameDisplay">Black Scissor Hair Saloon</span></div>
+      <div class="line"><span>Account Number</span><span class="value" id="recAccountDisplay">03******039</span></div>
+      <div class="line"><span>Bank</span><span class="value" id="recBankDisplay">Easypaisa</span></div>
+      
+      <div class="rule"></div>
+      <div class="section-title">Sent by</div>
+      <div class="line"><span>Name</span><span class="value" id="senderNameDisplay"></span></div>
+      <div class="line"><span>Account Number</span><span class="value" id="senderPhoneDisplay"></span></div>
+      
+      <div class="rule"></div>
+      <div class="section-title">Charges</div>
+      <div class="line"><span>Amount</span><span class="value" id="amountDisplay1">Rs. 1,000.00</span></div>
+      <div class="line"><span>Fee</span><span class="value">Free</span></div>
+      <div class="rule"></div>
+      <div class="total"><span>Total Amount</span><span class="value" id="amountDisplay2">Rs. 1,000.00</span></div>
+      <div class="rule"></div>
+    </section>
 
-  <div class="action-buttons-container">
-    <a href="index.html" class="btn-home">Back to Home</a>
-    
-    <button class="btn-circle" id="shareBtn" title="Share Receipt">
-      <svg viewBox="0 0 24 24">
-        <circle cx="18" cy="5" r="3"></circle>
-        <circle cx="6" cy="12" r="3"></circle>
-        <circle cx="18" cy="19" r="3"></circle>
-        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
-      </svg>
-    </button>
+    <footer class="paid-via">
+      <span>Paid via</span>
+      <span class="paid-via-logo-wrap">
+        <img src="logo2.png" alt="Paid via Logo">
+        <small>digital bank</small>
+      </span>
+    </footer>
+  </main>
+</div>
 
-    <button class="btn-circle" id="downloadBtn" title="Download Receipt">
-      <svg viewBox="0 0 24 24">
-        <path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </button>
-  </div>
-</main>
+<div class="action-buttons-container">
+  <a href="index.html" class="btn-home">Back to Home</a>
+  
+  <button class="btn-circle" id="shareBtn" title="Share Receipt">
+    <svg viewBox="0 0 24 24">
+      <circle cx="18" cy="5" r="3"></circle>
+      <circle cx="6" cy="12" r="3"></circle>
+      <circle cx="18" cy="19" r="3"></circle>
+      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+    </svg>
+  </button>
+
+  <button class="btn-circle" id="downloadBtn" title="Download Receipt">
+    <svg viewBox="0 0 24 24">
+      <path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+</div>
 
 <script>
 window.addEventListener('DOMContentLoaded', () => {
     const savedSetup = JSON.parse(localStorage.getItem('savedUserSetup') || '{}');
     const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser') || '{}');
     
-    // Asal name aur phone number set karein
     const senderName = savedSetup.name || loggedInUser.senderName || loggedInUser.name || 'User';
     const senderPhone = savedSetup.phone || loggedInUser.senderPhone || loggedInUser.phone || loggedInUser.phoneNumber || 'Number not set';
 
-    // Receipt ke Sender section mein assign karein
     const senderNameEl = document.getElementById('senderNameDisplay');
     const senderPhoneEl = document.getElementById('senderPhoneDisplay');
 
     if (senderNameEl) senderNameEl.innerText = senderName;
     if (senderPhoneEl) senderPhoneEl.innerText = senderPhone;
   });
+
   document.getElementById('txIdDisplay').innerText = localStorage.getItem('txId') || '#57183949805';
   document.getElementById('txDateTimeDisplay').innerText = localStorage.getItem('txDateTime') || '11 October 2026, 5:23 PM';
   document.getElementById('recNameDisplay').innerText = localStorage.getItem('recName') || 'Black Scissor Hair Saloon';
@@ -314,9 +328,9 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('amountDisplay2').innerText = savedAmount;
 
   document.getElementById('shareBtn').addEventListener('click', () => {
-    const receiptElement = document.getElementById('receiptCard');
+    const captureElement = document.getElementById('captureArea');
     
-    html2canvas(receiptElement, {
+    html2canvas(captureElement, {
       scale: 2, 
       useCORS: true,
       backgroundColor: null
@@ -351,19 +365,19 @@ window.addEventListener('DOMContentLoaded', () => {
             console.log('Share error:', err);
           }
         } else {
-          alert('Aapke browser mein direct sharing supported nahi hai.');
+          alert('Your browser does not support sharing.');
         }
       }, 'image/png');
     }).catch(err => {
       console.error('Canvas error:', err);
-      alert('Receipt process nahi ho saki.');
+      alert('Could not generate receipt.');
     });
   });
 
   document.getElementById('downloadBtn').addEventListener('click', () => {
-    const receiptElement = document.getElementById('receiptCard');
+    const captureElement = document.getElementById('captureArea');
     
-    html2canvas(receiptElement, {
+    html2canvas(captureElement, {
       scale: 2, 
       useCORS: true,
       backgroundColor: null
@@ -375,7 +389,7 @@ window.addEventListener('DOMContentLoaded', () => {
       link.click();
       document.body.removeChild(link);
     }).catch(err => {
-      console.error('Download failed:', err); // Fixed console.p typo here
+      console.error('Download failed:', err);
       alert('Could not generate receipt image. Please try again.');
     });
   });
