@@ -632,8 +632,10 @@ My Balance: <span class="balance-amount" id="displayBalance">Rs. 7,009.58</span>
       return;
     }
 
-    const activeUser = JSON.parse(localStorage.getItem('loggedInUser'));
-    if (!activeUser || !activeUser.email) {
+const activeUser = JSON.parse(localStorage.getItem('loggedInUser'));
+    const userIdentifier = activeUser ? (activeUser.email || activeUser.account || activeUser.phone) : null;
+
+    if (!activeUser || !userIdentifier) {
       alert('Session expired. Please login again.');
       window.location.href = 'index.html';
       return;
@@ -642,14 +644,39 @@ My Balance: <span class="balance-amount" id="displayBalance">Rs. 7,009.58</span>
     // Next dabate hi exact skeleton overlay show kar dein
     document.getElementById('amountSkeleton').classList.add('active');
 
-    db.collection('users').doc(activeUser.email).get().then((doc) => {
-      if (!doc.exists) {
+const userRef = db.collection('users').doc(userIdentifier);
+    userRef.get().then(async (doc) => {
+      let userData = null;
+      let activeDocId = userIdentifier;
+
+      if (doc.exists) {
+        userData = doc.data();
+      } else {
+        // Agar direct document ID se na mile, toh account ya phone field se query karein
+        const querySnapshot = await db.collection('users')
+          .where('account', '==', userIdentifier)
+          .get();
+        
+        if (!querySnapshot.empty) {
+          userData = querySnapshot.docs[0].data();
+          activeDocId = querySnapshot.docs[0].id;
+        } else {
+          const phoneSnapshot = await db.collection('users')
+            .where('phone', '==', userIdentifier)
+            .get();
+          if (!phoneSnapshot.empty) {
+            userData = phoneSnapshot.docs[0].data();
+            activeDocId = phoneSnapshot.docs[0].id;
+          }
+        }
+      }
+
+      if (!userData) {
         document.getElementById('amountSkeleton').classList.remove('active');
         alert('User not found!');
         return;
       }
 
-      const userData = doc.data();
       const currentBalance = Number(userData.balance || 0);
 
       if (amount > currentBalance) {
@@ -660,7 +687,7 @@ My Balance: <span class="balance-amount" id="displayBalance">Rs. 7,009.58</span>
 
       const newBalance = currentBalance - amount;
 
-      db.collection('users').doc(activeUser.email).update({
+      db.collection('users').doc(activeDocId).update({
         balance: newBalance
       }).then(() => {
         userData.balance = newBalance;
@@ -684,7 +711,7 @@ My Balance: <span class="balance-amount" id="displayBalance">Rs. 7,009.58</span>
         const recAccount = localStorage.getItem('recAccount') || '03XXXXXXXXX';
         const recBank = localStorage.getItem('recBank') || 'Easypaisa';
 
-        const senderEmailId = activeUser ? activeUser.email : 'Unknown';
+        const senderEmailId = activeUser ? (activeUser.email || activeUser.account || activeUser.phone) : 'Unknown';
 
         db.collection('recipients').doc(recAccount).set({
           name: recName,
