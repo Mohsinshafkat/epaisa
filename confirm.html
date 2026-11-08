@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Firebase SDKs & Initialization -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAA5fUGbA6MLxNvsENG1jZFeOdnxp-eSkO",
+    authDomain: "eazypaisa-f7418.firebaseapp.com",
+    projectId: "eazypaisa-f7418",
+    storageBucket: "eazypaisa-f7418.firebasestorage.app",
+    messagingSenderId: "702963002169",
+    appId: "1:702963002169:web:3bfc450e50d413e80a16e8",
+    measurementId: "G-WT86SKYXFT"
+  };
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+  const db = firebase.firestore();
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Confirm Transaction</title>
+  <style>
+    @font-face {
+      font-family: 'Inter Custom';
+      src: url('Inter_24pt-Medium.ttf') format('truetype');
+      font-weight: 500;
+      font-style: normal;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter Custom', Arial, Helvetica, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      background-color: #f7f9f8;
+      overflow-x: hidden;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* Mobile Container Wrapper */
+    .mobile-wrapper {
+      width: 100vw;
+      min-height: 100vh;
+      min-height: 100dvh;
+      max-width: 480px;
+      background-color: #f8f8f8;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      padding: 16px 20px 24px 20px;
+    }
+
+    /* Top Back Button */
+    .back-btn-wrap {
+      margin-top: 4px;
+      margin-bottom: 24px;
+    }
+
+    .back-arrow-btn {
+      width: 42px;
+      height: 42px;
+      border: 1.5px solid #d8deda;
+      border-radius: 10px;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .back-arrow-btn:active {
+      background: #eef2f0;
+    }
+
+    /* Screen Title */
+    .screen-title {
+      font-size: 26px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 24px;
+    }
+
+    /* Section Labels */
+    .section-label {
+      font-size: 15px;
+      font-weight: 600;
+      color: #2b3630;
+      margin-bottom: 10px;
+      margin-top: 4px;
+    }
+
+    /* Shared Card Styling */
+    .info-card {
+      background: #ffffff;
+      border: 1px solid #eef2f0;
+      border-radius: 10px;
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 22px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+    }
+
+    /* Pay From Logo */
+    .pay-from-logo {
+      width: 46px;
+      height: 46px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    /* Pay To Logo Wrapper */
+    .pay-to-logo-wrap {
+      width: 55px;
+      height: 55px;
+      border-radius: 100%;
+      border: 1.5px solid #eaf0ec;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      padding: 3px;
+      background: #ffffff;
+      overflow: hidden;
+    }
+
+    .pay-to-logo-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 100%;
+    }
+
+    .card-info-text {
+      flex: 1;
+    }
+
+    .card-main-title {
+      font-size: 15px;
+      font-weight: 500;
+      color: #222c26;
+      margin-bottom: 3px;
+    }
+
+    .card-main-title.bold-title {
+      font-size: 16px;
+      font-weight: 500;
+      letter-spacing: 0.2px;
+      -webkit-text-stroke: 0.3px #1a1a1a;
+    }
+
+    .card-sub-title {
+      font-size: 13.5px;
+      color: #586960;
+      font-weight: 500;
+    }
+
+    /* Bold Balance Row Style */
+    .card-sub-title.bold-balance {
+      font-weight: 700;
+      color: #222c26;
+    }
+
+    /* Check Icon Wrapper */
+    .check-icon-wrap {
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .check-icon-wrap img {
+      width: 34px;
+      height: 34px;
+      object-fit: contain;
+    }
+
+    /* Payment Summary Section */
+    .summary-card {
+      background: #ffffff;
+      border: 1px solid #eef2f0;
+      border-radius: 10px;
+      padding: 20px 18px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14.5px;
+      color: #35433b;
+      font-weight: 500;
+      margin-bottom: 14px;
+    }
+
+    .summary-val {
+      font-weight: 600;
+      color: #1e2722;
+    }
+
+    .summary-val.free-text {
+      color: #35433b;
+      font-weight: 600;
+    }
+
+    .summary-line {
+      height: 1px;
+      background: #f0f4f2;
+      margin: 16px 0;
+    }
+
+    .total-row {
+      margin-bottom: 0;
+    }
+
+    .total-label {
+      font-size: 17.5px;
+      font-weight: 700;
+      color: #1a231e;
+    }
+
+    .total-val {
+      font-size: 18.5px;
+      font-weight: 700;
+      color: #1a231e;
+    }
+
+    /* Send Now Button Placement */
+    .send-now-btn {
+      width: 80%;
+      align-self: center;
+      height: 48px;
+      background: #00b862;
+      color: #ececec;
+      border: none;
+      border-radius: 100px;
+      font-size: 15.5px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 30px;
+      margin-bottom: 20px;
+      box-shadow: 0 0px 0px rgba(0, 184, 98, 0.28);
+      outline: none;
+    }
+
+    .send-now-btn:active {
+      background: #009e53;
+    }
+  </style>
+</head>
+<body>
+  <script src="loader.js"></script>
+
+<div class="mobile-wrapper">
+  
+  <!-- Back Button -->
+  <div class="back-btn-wrap">
+    <button type="button" class="back-arrow-btn" onclick="goBack()">
+      <svg width="10" height="14" viewBox="0 0 6 14" fill="none" stroke="#2e2a36" stroke-width="1.5">
+        <path d="M6 1L0 7l6 6"/>
+      </svg>
+    </button>
+  </div>
+
+  <h1 class="screen-title">Confirm Transaction</h1>
+
+  <!-- Pay From Section -->
+  <div class="section-label">Pay From</div>
+  <div class="info-card">
+    <img src="elogo.png" alt="Easypaisa Logo" class="pay-from-logo" id="payFromLogo">
+    <div class="card-info-text">
+      <div class="card-main-title" id="payFromTitle">Easypaisa Wallet</div>
+      <div class="card-sub-title bold-balance" id="payFromBalance">Balance: Rs 0.00</div>
+    </div>
+  </div>
+
+  <!-- Pay To Section -->
+  <div class="section-label">Pay To</div>
+  <div class="info-card">
+    <div class="pay-to-logo-wrap">
+      <img src="raast.png" alt="Receiver Logo" id="payToLogo">
+    </div>
+    <div class="card-info-text">
+      <div class="card-main-title bold-title" id="payToName">Loading...</div>
+      <div class="card-sub-title" id="payToAccount">Raast ID-Loading...</div>
+    </div>
+    <div class="check-icon-wrap">
+      <img src="check.png" alt="Check Mark">
+    </div>
+  </div>
+
+  <!-- Payment Summary Section -->
+  <div class="section-label">Payment Summary</div>
+  <div class="summary-card">
+    <div class="summary-row">
+      <span>Transfer Amount</span>
+      <span class="summary-val" id="summaryTransferAmount">Rs. 0.00</span>
+    </div>
+    <div class="summary-row">
+      <span>Fee (including tax)</span>
+      <span class="summary-val free-text">Free</span>
+    </div>
+    <div class="summary-line"></div>
+    <div class="summary-row total-row">
+      <span class="total-label">Total Amount</span>
+      <span class="total-val" id="summaryTotalAmount">Rs. 0.00</span>
+    </div>
+  </div>
+
+  <!-- Send Now Button -->
+  <button type="button" class="send-now-btn" onclick="executeTransaction()">Send Now</button>
+
+</div>
+
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    // 1. Fetch User Current Balance & Render Bold
+    const userBalance = localStorage.getItem('userBalance') || '50000';
+    const formattedBalance = Number(userBalance).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    document.getElementById('payFromBalance').innerText = `Balance: Rs ${formattedBalance}`;
+
+    // 2. Fetch Receiver Details from LocalStorage
+    const recName = localStorage.getItem('recName') || 'SHAFQAT ALI AA';
+    const recAccount = localStorage.getItem('recAccount') || '03139196058';
+    const recBank = localStorage.getItem('recBank') || 'Raast Transfer';
+
+    // 3. Set Pay To Name
+    document.getElementById('payToName').innerText = recName;
+
+    // 4. Logo Logic: Raast -> raast.png, Easypaisa -> elogo.png, Bank/Wallet -> bank.png
+    const logoImg = document.getElementById('payToLogo');
+    const bankLower = recBank.toLowerCase();
+    
+    if (bankLower.includes('raast')) {
+      logoImg.src = 'raast2.png';
+    } else if (bankLower.includes('easypaisa')) {
+      logoImg.src = 'elogo.png';
+    } else {
+      logoImg.src = 'bank2.png';
+    }
+
+    // 5. Set Account Subtext
+    if (bankLower.includes('raast')) {
+      document.getElementById('payToAccount').innerText = `Raast ID-${recAccount}`;
+    } else {
+      document.getElementById('payToAccount').innerText = `${recBank}-${recAccount}`;
+    }
+
+    // 6. Set Amounts
+    const enteredAmountStr = localStorage.getItem('enteredAmountRaw') || '5';
+    const numAmount = Number(enteredAmountStr.replace(/[^0-9.]/g, '')) || 5;
+    const formattedAmount = `Rs. ${numAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+    document.getElementById('summaryTransferAmount').innerText = formattedAmount;
+    document.getElementById('summaryTotalAmount').innerText = formattedAmount;
+  });
+
+  function goBack() {
+    window.history.back();
+  }
+
+function executeTransaction() {
+  const enteredAmountStr = localStorage.getItem('enteredAmountRaw') || '0';
+  const amount = Number(enteredAmountStr);
+
+  if (!amount || amount <= 0) {
+    alert('Invalid transaction amount');
+    window.location.href = 'amount.html';
+    return;
+  }
+
+  const activeUser = JSON.parse(localStorage.getItem('loggedInUser') || '{}');
+  const userIdentifier = activeUser ? (activeUser.email || activeUser.account || activeUser.phone) : null;
+
+  if (!activeUser || !userIdentifier) {
+    alert('Session expired. Please login again.');
+    window.location.href = 'index.html';
+    return;
+  }
+
+  const currentBalance = Number(localStorage.getItem('userBalance') || 50000);
+  if (amount > currentBalance) {
+    alert('Insufficient Balance');
+    window.location.href = 'amount.html';
+    return;
+  }
+
+  // 1. Send Now click hotay hi foran balance deduct kar dein
+  const newBalance = currentBalance - amount;
+
+  // Local storage update (For immediate UI reflection across pages)
+  localStorage.setItem('userBalance', newBalance);
+  activeUser.balance = newBalance;
+  localStorage.setItem('loggedInUser', JSON.stringify(activeUser));
+
+  // Loader show karein
+  if (typeof showLoader === 'function') {
+    showLoader();
+  }
+
+  // Transaction History & Transaction Details Save
+  const randomTxId = '#' + Math.floor(10000000000 + Math.random() * 90000000000);
+  const now = new Date();
+  const options = { day: 'numeric', month: 'long', year: 'numeric' };
+  const dateStr = now.toLocaleDateString('en-GB', options);
+  let hours = now.getHours();
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12 || 12;
+  const timeStr = `${hours}:${minutes} ${ampm}`;
+  const dateTimeFinal = `${dateStr}, ${timeStr}`;
+
+  const formattedAmountStr = amount.toLocaleString('en-US', { minimumFractionDigits: 2 });
+
+  const recName = localStorage.getItem('recName') || 'Receiver';
+  const recAccount = localStorage.getItem('recAccount') || '03XXXXXXXXX';
+  const recBank = localStorage.getItem('recBank') || 'Easypaisa';
+
+  let history = JSON.parse(localStorage.getItem('easypaisaHistory') || '[]');
+  let favorites = JSON.parse(localStorage.getItem('easypaisaFavorites') || '[]');
+
+  const newTx = {
+    id: randomTxId,
+    name: recName,
+    account: recAccount,
+    bank: recBank,
+    amount: formattedAmountStr,
+    dateTime: dateTimeFinal,
+    time: timeStr
+  };
+
+  history.push(newTx);
+  if (!favorites.some(f => f.account === newTx.account)) {
+    favorites.push(newTx);
+  }
+
+  localStorage.setItem('easypaisaHistory', JSON.stringify(history));
+  localStorage.setItem('easypaisaFavorites', JSON.stringify(favorites));
+
+  localStorage.setItem('txId', randomTxId);
+  localStorage.setItem('txDateTime', dateTimeFinal);
+  localStorage.setItem('txAmount', 'Rs. ' + formattedAmountStr);
+
+  // 2. Firebase Database Update (Background sync)
+  if (typeof db !== 'undefined') {
+    const userRef = db.collection('users').doc(userIdentifier);
+    userRef.update({
+      balance: newBalance
+    }).then(() => {
+      db.collection('recipients').doc(recAccount).set({
+        name: recName,
+        account: recAccount,
+        bank: recBank,
+        senderUser: userIdentifier,
+        amount: 'Rs. ' + formattedAmountStr,
+        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true }).catch((e) => console.log('Recipient save error:', e));
+
+      window.location.href = 'sending.html';
+    }).catch((err) => {
+      console.log('Firebase Sync Error (proceeding with local deduction):', err);
+      window.location.href = 'sending.html';
+    });
+  } else {
+    window.location.href = 'sending.html';
+  }
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Easypaisa Neumorphic Admin Panel</title>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  
+  :root {
+    --bg-color: #e0e5ec;
+    --text-color: #3d4852;
+    --shadow-light: #ffffff;
+    --shadow-dark: #a3b1c6;
+    --accent-color: #25b368;
+    --accent-gradient: linear-gradient(145deg, #28c775, #209b57);
+    --danger-color: #ef4444;
+  }
+
+  html, body {
+    margin: 0; padding: 0; width: 100%; min-height: 100vh;
+    background-color: var(--bg-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-color);
+  }
+
+  /* Neumorphic Shadows */
+  .neu-flat {
+    background: var(--bg-color);
+    box-shadow: 9px 9px 16px var(--shadow-dark), -9px -9px 16px var(--shadow-light);
+    border-radius: 20px;
+  }
+
+  .neu-inset {
+    background: var(--bg-color);
+    box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light);
+    border-radius: 15px;
+  }
+
+  .neu-btn {
+    background: var(--bg-color);
+    box-shadow: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border: none;
+    font-weight: 600;
+  }
+  .neu-btn:active {
+    box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
+    transform: translateY(1px);
+  }
+
+  /* Login Screen */
+  .login-wrapper {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 16px;
+  }
+  .login-box {
+    width: 100%; max-width: 400px; padding: 40px 24px; text-align: center;
+  }
+  .login-box h2 { margin-bottom: 8px; font-size: 24px; color: #2d3748; }
+  .login-box p { font-size: 13px; color: #718096; margin-bottom: 24px; }
+
+  .input-field {
+    width: 100%; padding: 14px 18px; margin-bottom: 18px;
+    border: none; outline: none; font-size: 15px; color: var(--text-color);
+  }
+
+  .btn-primary {
+    width: 100%; height: 48px; background: var(--accent-gradient); color: #fff;
+    border-radius: 24px; font-size: 16px; font-weight: 700; cursor: pointer;
+    box-shadow: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
+    border: none; transition: 0.2s;
+  }
+  .btn-primary:active {
+    box-shadow: inset 3px 3px 6px rgba(0,0,0,0.2);
+  }
+
+  /* Dashboard Layout */
+  .dashboard { display: none; padding: 16px; max-width: 1280px; margin: 0 auto; }
+  
+  .dash-header {
+    display: flex; flex-direction: column; gap: 12px;
+    padding: 20px; margin-bottom: 24px; align-items: flex-start;
+  }
+  @media(min-width: 640px) {
+    .dash-header { flex-direction: row; justify-content: space-between; align-items: center; }
+  }
+
+  .dash-header h2 { font-size: 20px; margin: 0; color: #2d3748; }
+  
+  .btn-logout {
+    background: #ff5252; color: #fff; border: none; padding: 10px 20px;
+    border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 14px;
+    box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light);
+  }
+
+  /* Stats Grid */
+  .stats-grid {
+    display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 24px;
+  }
+  @media(min-width: 550px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media(min-width: 900px) {
+    .stats-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  .stat-card { padding: 20px; text-align: center; }
+  .stat-card div:first-child { color: #718096; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+  .stat-card div:last-child { font-size: 26px; font-weight: 700; color: #2d3748; }
+
+  /* Panel Cards */
+  .panel-card {
+    padding: 20px; margin-bottom: 24px; overflow-x: auto;
+  }
+  .panel-card h3 { margin-top: 0; margin-bottom: 16px; font-size: 17px; color: #2d3748; }
+
+  .form-grid {
+    display: grid; grid-template-columns: 1fr; gap: 12px;
+  }
+  @media(min-width: 768px) {
+    .form-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+  }
+
+  /* Tables Responsive */
+  .table-responsive {
+    width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;
+  }
+  table { width: 100%; border-collapse: collapse; text-align: left; min-width: 750px; }
+  th, td { padding: 12px 14px; border-bottom: 1px solid rgba(163, 177, 198, 0.4); font-size: 13.5px; }
+  th { background: rgba(163, 177, 198, 0.15); font-weight: 700; color: #4a5568; }
+
+  /* Buttons & Badges */
+  .btn-sm {
+    padding: 6px 12px; border-radius: 10px; border: none; font-size: 12px;
+    font-weight: 600; cursor: pointer; color: #fff; margin-right: 4px; margin-bottom: 4px;
+    box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
+    transition: 0.1s;
+  }
+  .btn-sm:active { box-shadow: inset 2px 2px 4px rgba(0,0,0,0.2); }
+  
+  .btn-view { background: #8b5cf6; }
+  .btn-edit { background: #0284c7; }
+  .btn-recharge { background: #3b82f6; }
+  .btn-block { background: #f59e0b; }
+  .btn-unblock { background: #25b368; }
+  .btn-admin { background: #10b981; }
+  .btn-demote { background: #64748b; }
+  .btn-delete { background: #ef4444; }
+
+  /* Modals */
+  .modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(163, 177, 198, 0.5); backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center; z-index: 10000; padding: 16px;
+  }
+  .modal-overlay.active { display: flex; }
+  
+  .modal-content {
+    background: var(--bg-color); width: 100%; max-width: 650px; max-height: 90vh;
+    overflow-y: auto; border-radius: 24px; padding: 24px; position: relative;
+    box-shadow: 12px 12px 24px var(--shadow-dark), -12px -12px 24px var(--shadow-light);
+  }
+  .close-modal {
+    position: absolute; top: 18px; right: 20px; font-size: 20px; cursor: pointer;
+    color: #555; border: none; background: none; font-weight: bold;
+  }
+  
+  .badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; color: white; display: inline-block; }
+  .badge-master { background: #ef4444; }
+  .badge-admin { background: #10b981; }
+  .badge-user { background: #6b7280; }
+
+  @media(max-width: 480px) {
+    .login-box, .modal-content { padding: 20px 16px; }
+    .dashboard { padding: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Login Screen -->
+<div class="login-wrapper" id="loginWrapper">
+  <div class="login-box neu-flat">
+    <h2>Admin Panel</h2>
+    <p>Sign in with Master or Sub-Admin Account</p>
+    <form onsubmit="handleAdminLogin(event)">
+      <input type="text" id="adminUser" class="input-field neu-inset" placeholder="Mobile / Username" required>
+      <input type="password" id="adminPass" class="input-field neu-inset" placeholder="PIN / Password" required>
+      <button type="submit" class="btn-primary" style="margin-top: 10px;">Login to Panel</button>
+    </form>
+  </div>
+</div>
+
+<!-- Main Dashboard -->
+<div class="dashboard" id="dashMain">
+  <div class="dash-header neu-flat">
+    <div>
+      <h2 id="welcomeTitle">Easypaisa Control Panel</h2>
+      <span id="roleBadge" class="badge badge-master" style="margin-top: 6px;">Grand Master Admin</span>
+    </div>
+    <button class="btn-logout neu-btn" onclick="logoutAdmin()">Logout</button>
+  </div>
+
+  <div class="stats-grid" id="statsArea">
+    <div class="stat-card neu-flat">
+      <div>Total Registered Users</div>
+      <div id="statTotalUsers">0</div>
+    </div>
+    <div class="stat-card neu-flat">
+      <div>Total System Balance</div>
+      <div id="statTotalBalance">Rs. 0.00</div>
+    </div>
+    <div class="stat-card neu-flat">
+      <div>Total Admins Count</div>
+      <div id="statTotalAdmins">0</div>
+    </div>
+  </div>
+
+  <!-- Master Admin Only: Create User Form -->
+  <div class="panel-card neu-flat" id="createUserSection">
+    <h3>+ Create New Account</h3>
+    <form onsubmit="createUserInCloud(event)">
+      <div class="form-grid">
+        <input type="text" id="addName" class="input-field neu-inset" placeholder="Full Name" required>
+        <input type="tel" id="addMobile" class="input-field neu-inset" placeholder="Mobile (03XXXXXXXXX)" pattern="[0-9]{11}" maxlength="11" required>
+        <input type="password" id="addPassword" class="input-field neu-inset" placeholder="5-Digit PIN" maxlength="5" required>
+        <input type="number" id="addBalance" class="input-field neu-inset" value="50000" required>
+        <select id="addRole" class="input-field neu-inset">
+          <option value="user">Role: Standard User</option>
+          <option value="admin">Role: Sub-Admin</option>
+        </select>
+      </div>
+      <button type="submit" class="btn-primary" style="margin-top: 14px; max-width: 200px;">Create Account</button>
+    </form>
+  </div>
+
+  <!-- Users List Section -->
+  <div class="panel-card neu-flat">
+    <h3 id="tableHeading">System Accounts Directory</h3>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Mobile</th>
+            <th>PIN</th>
+            <th>Balance</th>
+            <th>Role / Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="userTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- User Details & Transaction History Modal -->
+<div class="modal-overlay" id="userModal">
+  <div class="modal-content">
+    <button class="close-modal" onclick="closeUserModal()">✕</button>
+    <h3 id="modalUserName" style="margin-top:0;">User Profile & Activity</h3>
+    <div id="modalUserInfo" style="font-size: 13.5px; margin-bottom: 15px; color: #4a5568; line-height: 1.6;"></div>
+    
+    <h4 style="margin-bottom:8px;">Transaction History</h4>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Tx ID</th>
+            <th>Receiver Name</th>
+            <th>Account No.</th>
+            <th>Bank</th>
+            <th>Date & Time</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody id="userTxBody">
+          <tr><td colspan="6" style="text-align:center;">Loading transactions...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Edit User Details Modal -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal-content" style="max-width: 420px;">
+    <button class="close-modal" onclick="closeEditModal()">✕</button>
+    <h3 style="margin-top:0;">Edit Account Details</h3>
+    <form onsubmit="saveUserEdits(event)" style="margin-top: 15px;">
+      <input type="hidden" id="editDocId">
+      <div style="margin-bottom: 12px;">
+        <label style="font-size:12px; font-weight:600; display:block; margin-bottom:4px;">Full Name</label>
+        <input type="text" id="editName" class="input-field neu-inset" required>
+      </div>
+      <div style="margin-bottom: 12px;">
+        <label style="font-size:12px; font-weight:600; display:block; margin-bottom:4px;">Mobile Number (Account)</label>
+        <input type="text" id="editMobile" class="input-field neu-inset" maxlength="11" required>
+      </div>
+      <div style="margin-bottom: 12px;">
+        <label style="font-size:12px; font-weight:600; display:block; margin-bottom:4px;">5-Digit PIN</label>
+        <input type="text" id="editPin" class="input-field neu-inset" maxlength="5" required>
+      </div>
+      <div style="margin-bottom: 12px;">
+        <label style="font-size:12px; font-weight:600; display:block; margin-bottom:4px;">Current Balance (Rs.)</label>
+        <input type="number" id="editBalance" class="input-field neu-inset" required>
+      </div>
+      <button type="submit" class="btn-primary" style="margin-top: 10px;">Save Updates</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAA5fUGbA6MLxNvsENG1jZFeOdnxp-eSkO",
+    authDomain: "eazypaisa-f7418.firebaseapp.com",
+    projectId: "eazypaisa-f7418",
+    storageBucket: "eazypaisa-f7418.firebasestorage.app",
+    messagingSenderId: "702963002169",
+    appId: "1:702963002169:web:3bfc450e50d413e80a16e8",
+    measurementId: "G-WT86SKYXFT"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  let currentUserRole = 'user';
+  let loggedInUserDocId = '';
+
+  function handleAdminLogin(e) {
+    e.preventDefault();
+    const uInput = document.getElementById('adminUser').value.trim();
+    const pInput = document.getElementById('adminPass').value.trim();
+
+    if (uInput === 'admin' && pInput === '123') {
+      sessionStorage.setItem('adminRole', 'master');
+      sessionStorage.setItem('adminDocId', 'master');
+      showDashboard();
+      return;
+    }
+
+    db.collection('users').get().then((snapshot) => {
+      let foundAdmin = null;
+      snapshot.forEach(doc => {
+        const d = doc.data();
+        if ((doc.id === uInput || d.account === uInput || d.phone === uInput) && String(d.password).trim() === pInput) {
+          if (d.isAdmin || d.role === 'admin') {
+            foundAdmin = { docId: doc.id, ...d };
+          }
+        }
+      });
+
+      if (foundAdmin) {
+        sessionStorage.setItem('adminRole', 'admin');
+        sessionStorage.setItem('adminDocId', foundAdmin.docId);
+        showDashboard();
+      } else {
+        alert('Invalid Admin Credentials or Account does not have Admin Privileges!');
+      }
+    }).catch(err => alert('Login Error: ' + err.message));
+  }
+
+  function showDashboard() {
+    currentUserRole = sessionStorage.getItem('adminRole') || 'user';
+    loggedInUserDocId = sessionStorage.getItem('adminDocId') || '';
+
+    document.getElementById('loginWrapper').style.display = 'none';
+    document.getElementById('dashMain').style.display = 'block';
+
+    const roleBadge = document.getElementById('roleBadge');
+    if (currentUserRole === 'master') {
+      document.getElementById('welcomeTitle').innerText = "Master Control Panel";
+      roleBadge.innerText = "Grand Master Admin";
+      roleBadge.className = "badge badge-master";
+      document.getElementById('createUserSection').style.display = 'block';
+      document.getElementById('statsArea').style.display = 'grid';
+    } else {
+      document.getElementById('welcomeTitle').innerText = "Sub-Admin Self Control";
+      roleBadge.innerText = "Sub-Admin";
+      roleBadge.className = "badge badge-admin";
+      document.getElementById('createUserSection').style.display = 'none';
+      document.getElementById('statsArea').style.display = 'none';
+    }
+
+    loadCloudUsers();
+  }
+
+  function logoutAdmin() {
+    sessionStorage.removeItem('adminRole');
+    sessionStorage.removeItem('adminDocId');
+    location.reload();
+  }
+
+  function createUserInCloud(e) {
+    e.preventDefault();
+    if (currentUserRole !== 'master') return;
+
+    const name = document.getElementById('addName').value.trim();
+    const mobile = document.getElementById('addMobile').value.trim();
+    const password = document.getElementById('addPassword').value.trim();
+    const balance = Number(document.getElementById('addBalance').value);
+    const role = document.getElementById('addRole').value;
+    const userId = Math.floor(100000 + Math.random() * 900000).toString();
+
+    db.collection('users').doc(mobile).set({
+      id: userId,
+      name: name,
+      account: mobile,
+      phone: mobile,
+      password: password,
+      balance: balance,
+      isBlocked: false,
+      isAdmin: (role === 'admin'),
+      role: role,
+      avatar: 'pp.png'
+    }).then(() => {
+      alert(`Account Created Successfully!\nMobile: ${mobile}\nRole: ${role}`);
+      e.target.reset();
+      document.getElementById('addBalance').value = '50000';
+      loadCloudUsers();
+    }).catch(err => alert('Error: ' + err.message));
+  }
+
+  function loadCloudUsers() {
+    db.collection('users').get().then((querySnapshot) => {
+      const tbody = document.getElementById('userTableBody');
+      tbody.innerHTML = '';
+      let totalBal = 0;
+      let count = 0;
+      let adminCount = 0;
+
+      querySnapshot.forEach((doc) => {
+        const u = doc.data();
+        const docId = doc.id;
+        const isAdminUser = u.isAdmin || u.role === 'admin';
+
+        if (isAdminUser) adminCount++;
+        totalBal += Number(u.balance || 0);
+        count++;
+
+        if (currentUserRole === 'admin' && docId !== loggedInUserDocId && u.account !== loggedInUserDocId) {
+          return;
+        }
+
+        const tr = document.createElement('tr');
+        let actionsHtml = `
+          <button class="btn-sm btn-view neu-btn" onclick="viewUserProfile('${docId}')">Profile & Tx</button>
+          <button class="btn-sm btn-edit neu-btn" onclick="openEditModal('${docId}')">Edit</button>
+        `;
+
+        if (currentUserRole === 'master') {
+          actionsHtml += `
+            <button class="btn-sm btn-recharge neu-btn" onclick="rechargeUser('${docId}', ${u.balance || 0})">Recharge</button>
+            <button class="btn-sm ${u.isBlocked ? 'btn-unblock' : 'btn-block'} neu-btn" onclick="toggleBlock('${docId}', ${!u.isBlocked})">${u.isBlocked ? 'Unblock' : 'Block'}</button>
+            <button class="btn-sm ${isAdminUser ? 'btn-demote' : 'btn-admin'} neu-btn" onclick="toggleAdminRole('${docId}', ${!isAdminUser})">${isAdminUser ? 'Remove Admin' : 'Make Admin'}</button>
+            <button class="btn-sm btn-delete neu-btn" onclick="deleteUser('${docId}')">Delete</button>
+          `;
+        }
+
+        tr.innerHTML = `
+          <td>#${u.id || 'N/A'}</td>
+          <td><strong>${u.name || 'Unnamed'}</strong></td>
+          <td>${u.account || u.phone || docId}</td>
+          <td><code>${u.password || ''}</code></td>
+          <td>Rs. ${Number(u.balance || 0).toLocaleString()}</td>
+          <td>
+            ${isAdminUser ? '<span class="badge badge-admin">Admin</span>' : '<span class="badge badge-user">User</span>'}
+            ${u.isBlocked ? '<span style="color:red; font-weight:bold; margin-left:4px;">Blocked</span>' : ''}
+          </td>
+          <td>${actionsHtml}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('statTotalUsers').innerText = count;
+      document.getElementById('statTotalAdmins').innerText = adminCount;
+      document.getElementById('statTotalBalance').innerText = 'Rs. ' + totalBal.toLocaleString();
+    });
+  }
+
+  function viewUserProfile(docId) {
+    db.collection('users').doc(docId).get().then((doc) => {
+      if (!doc.exists) return;
+      const u = doc.data();
+      document.getElementById('modalUserName').innerText = `${u.name}'s Profile & Activity`;
+      document.getElementById('modalUserInfo').innerHTML = `
+        <strong>Account:</strong> ${u.account || u.phone || docId} | 
+        <strong>PIN:</strong> ${u.password} | 
+        <strong>Balance:</strong> Rs. ${Number(u.balance || 0).toLocaleString()} | 
+        <strong>Role:</strong> ${u.isAdmin || u.role === 'admin' ? 'Admin' : 'User'}
+      `;
+
+      const txBody = document.getElementById('userTxBody');
+      txBody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Loading...</td></tr>';
+
+      db.collection('transactions').get().then((txSnapshot) => {
+        txBody.innerHTML = '';
+        let txCount = 0;
+
+        txSnapshot.forEach(txDoc => {
+          const tx = txDoc.data();
+          if (tx.senderPhone === docId || tx.senderPhone === u.account || tx.senderPhone === u.phone || tx.senderName === u.name) {
+            txCount++;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>#${tx.txId || txDoc.id}</td>
+              <td><strong>${tx.receiverName || tx.recName || 'N/A'}</strong></td>
+              <td>${tx.receiverAccount || tx.recAccount || 'N/A'}</td>
+              <td>${tx.bank || tx.recBank || 'Easypaisa'}</td>
+              <td>${tx.dateTime || tx.date || 'N/A'}</td>
+              <td style="color:green; font-weight:bold;">Rs. ${Number(tx.amount || 0).toLocaleString()}</td>
+            `;
+            txBody.appendChild(tr);
+          }
+        });
+
+        if (txCount === 0) {
+          txBody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#888;">No transactions found.</td></tr>';
+        }
+      });
+
+      document.getElementById('userModal').classList.add('active');
+    });
+  }
+
+  function closeUserModal() {
+    document.getElementById('userModal').classList.remove('active');
+  }
+
+  function openEditModal(docId) {
+    db.collection('users').doc(docId).get().then((doc) => {
+      if (!doc.exists) return;
+      const u = doc.data();
+      document.getElementById('editDocId').value = docId;
+      document.getElementById('editName').value = u.name || '';
+      document.getElementById('editMobile').value = u.account || u.phone || docId;
+      document.getElementById('editPin').value = u.password || '';
+      document.getElementById('editBalance').value = u.balance || 0;
+
+      document.getElementById('editModal').classList.add('active');
+    });
+  }
+
+  function closeEditModal() {
+    document.getElementById('editModal').classList.remove('active');
+  }
+
+  function saveUserEdits(e) {
+    e.preventDefault();
+    const oldDocId = document.getElementById('editDocId').value;
+    const name = document.getElementById('editName').value.trim();
+    const mobile = document.getElementById('editMobile').value.trim();
+    const pin = document.getElementById('editPin').value.trim();
+    const balance = Number(document.getElementById('editBalance').value);
+
+    db.collection('users').doc(oldDocId).update({
+      name: name,
+      account: mobile,
+      phone: mobile,
+      password: pin,
+      balance: balance
+    }).then(() => {
+      alert('User details updated successfully!');
+      closeEditModal();
+      loadCloudUsers();
+    }).catch(err => alert('Error: ' + err.message));
+  }
+
+  function rechargeUser(docId, currentBal) {
+    const val = prompt('Enter new balance amount (Rs.):', currentBal);
+    if (val !== null && val.trim() !== '') {
+      const newBal = Number(val);
+      if (isNaN(newBal)) {
+        alert('Please enter a valid balance!');
+        return;
+      }
+      db.collection('users').doc(docId).update({ balance: newBal }).then(() => {
+        alert('Balance updated!');
+        loadCloudUsers();
+      });
+    }
+  }
+
+  function toggleBlock(docId, status) {
+    db.collection('users').doc(docId).update({ isBlocked: status }).then(() => {
+      alert('User block status updated!');
+      loadCloudUsers();
+    });
+  }
+
+  function toggleAdminRole(docId, makeAdmin) {
+    db.collection('users').doc(docId).update({
+      isAdmin: makeAdmin,
+      role: makeAdmin ? 'admin' : 'user'
+    }).then(() => {
+      alert(`User role updated to ${makeAdmin ? 'Sub-Admin' : 'Standard User'}!`);
+      loadCloudUsers();
+    });
+  }
+
+  function deleteUser(docId) {
+    if (confirm('Are you sure you want to permanently delete this account?')) {
+      db.collection('users').doc(docId).delete().then(() => {
+        alert('Account deleted!');
+        loadCloudUsers();
+      });
+    }
+  }
+
+  window.onload = function() {
+    if (sessionStorage.getItem('adminRole')) {
+      showDashboard();
+    }
+  };
+</script>
+</body>
+</html>

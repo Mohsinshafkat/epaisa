@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Confirm Transaction Skeleton</title>
+  <style>
+    /* Reset and base styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100vh;
+      background-color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 414px;
+      height: 100vh;
+      max-height: 896px;
+      background-color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Header Styling (White Background) */
+    .header {
+      margin-top: 15px;
+      margin-bottom: 24px;
+      background-color: #ffffff;
+      flex-shrink: 0;
+    }
+
+    .back-btn {
+      background: #ffffff;
+      border: 1px solid #e5e5e5;
+      border-radius: 12px;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin-bottom: 20px;
+      margin-top: -15px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+
+    .page-title {
+      font-size: 26px;
+      font-weight: 600;
+      color: #1a1c23;
+      letter-spacing: -0.5px;
+    }
+
+    /* Blue Section Below Confirm Transaction */
+    .blue-section {
+      background-color: #ebebeb;
+      margin: -15px -15px -20px -15px;
+      padding: 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Main Content Layout */
+    .content {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .skeleton-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* Card Base (4 Bare Boxes - Green) */
+    .card {
+      background-color: #d6d6d6;
+      border-radius: 5px;
+      padding: 20px;
+      display: flex;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Section Specific Layouts */
+    .card-1 {
+      height: 70px;
+      border-radius: 8px;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .card-2 {
+      height: 85px;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .card-3 {
+      height: 150px;
+      justify-content: space-between;
+      padding: 18px 16px;
+    }
+
+    .card-3 .col {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      width: 45%;
+    }
+
+    .card-4 {
+      height: 75px;
+      flex-direction: column;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    /* Skeleton Inner Elements (Default Skeleton / Title boxes - Green) */
+    .skeleton {
+      background-color: #d6d6d6;
+      border-radius: 1px;
+    }
+
+    /* Inner elements inside cards (Boxes inside cards - Brown) */
+    .card .skeleton {
+      background-color: #bdbdbd;
+    }
+
+    .title-bar-sm {
+      width: 100px;
+      height: 16px;
+      border-radius: 3px;
+    }
+
+    .title-bar-md {
+      width: 130px;
+      height: 16px;
+      border-radius: 3px;
+    }
+
+    .icon-box {
+      width: 22px;
+      height: 22px;
+      border-radius: 3px;
+    }
+
+    .text-box-mid {
+      width: 100px;
+      height: 18px;
+    }
+
+    .text-box-right {
+      width: 80px;
+      height: 18px;
+      margin-left: auto;
+    }
+
+    .square-box {
+      width: 50px;
+      height: 50px;
+      border-radius: 4px;
+    }
+
+    .text-box-large {
+      width: 110px;
+      height: 24px;
+    }
+
+    .small-sq {
+      width: 24px;
+      height: 24px;
+      margin-left: auto;
+    }
+
+    .line-item {
+      height: 16px;
+      width: 100%;
+    }
+
+    .line-item-bold {
+      height: 22px;
+      margin-top: 4px;
+    }
+
+    .line-wide-1 {
+      width: 110px;
+      height: 16px;
+    }
+
+    .line-wide-2 {
+      width: 260px;
+      height: 16px;
+    }
+
+    /* Bottom Action Button (Centered & Green) */
+    .button-container {
+      margin-top: 10px;
+      padding-bottom: 80px;
+      display: flex;
+      justify-content: center;
+      position: relative;
+      z-index: 2;
+      flex-shrink: 0;
+    }
+
+    .action-btn {
+      width: 75%;
+      height: 52px;
+      border-radius: 26px;  
+      background-color: #d6d6d6;
+    }
+
+    /* Single Global Shimmer Animation Across the Page */
+    .global-shimmer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 5;
+    }
+
+    .global-shimmer::after {
+      content: "";
+      position: absolute;
+      top: -150%;
+      left: -150%;
+      width: 300%;
+      height: 300%;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0) 35%,
+        rgba(255, 255, 255, 0.45) 50%,
+        rgba(255, 255, 255, 0) 65%
+      );
+      animation: shine 1.8s infinite linear;
+    }
+
+    @keyframes shine {
+      0% {
+        transform: translate(-50%, -50%);
+      }
+      100% {
+        transform: translate(50%, 50%);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Header Section -->
+    <header class="header">
+      <button class="back-btn" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <h1 class="page-title">Confirm Transaction</h1>
+    </header>
+
+    <!-- Section below title till bottom -->
+    <div class="blue-section">
+      <!-- Global Shimmer Overlay -->
+      <div class="global-shimmer"></div>
+
+      <main class="content">
+        
+        <!-- Section 1 -->
+        <div class="skeleton-group">
+          <div class="skeleton title-bar-sm"></div>
+          <div class="card card-1">
+            <div class="skeleton icon-box"></div>
+            <div class="skeleton text-box-mid"></div>
+            <div class="skeleton text-box-right"></div>
+          </div>
+        </div>
+
+        <!-- Section 2 -->
+        <div class="skeleton-group">
+          <div class="skeleton title-bar-sm"></div>
+          <div class="card card-2">
+            <div class="skeleton square-box"></div>
+            <div class="skeleton text-box-large"></div>
+            <div class="skeleton small-sq"></div>
+          </div>
+        </div>
+
+        <!-- Section 3 -->
+        <div class="skeleton-group">
+          <div class="skeleton title-bar-md"></div>
+          <div class="card card-3">
+            <div class="col">
+              <div class="skeleton line-item"></div>
+              <div class="skeleton line-item"></div>
+              <div class="skeleton line-item line-item-bold"></div>
+            </div>
+            <div class="col">
+              <div class="skeleton line-item"></div>
+              <div class="skeleton line-item"></div>
+              <div class="skeleton line-item line-item-bold"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 4 -->
+        <div class="skeleton-group">
+          <div class="card card-4">
+            <div class="skeleton line-wide-1"></div>
+            <div class="skeleton line-wide-2"></div>
+          </div>
+        </div>
+
+      </main>
+
+      <!-- Button Skeleton -->
+      <div class="button-container">
+        <div class="skeleton action-btn"></div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

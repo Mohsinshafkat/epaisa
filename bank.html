@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Bank Transfer</title>
+<style>
+  @font-face {
+    font-family: 'Inter Regular';
+    src: url('Inter_24pt-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; width: 100%; min-height: 100vh; min-height: 100dvh;
+    background-color: #ffffff; font-family: 'Inter Regular', Arial, Helvetica, sans-serif; color: #2e2a36;
+  }
+  .container { max-width: 480px; margin: 0 auto; background: #fff; min-height: 100vh; display: flex; flex-direction: column; }
+  
+  /* Top White Header Area */
+  .top-header-area { padding: 16px 16px 0 16px; background: #fff; }
+  .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .back-btn { width: 36px; height: 36px; border: 1.5px solid #d8deda; border-radius: 10px; background: transparent; display: grid; place-items: center; cursor: pointer; font-size: 18px; }
+  .help-btn { padding: 6px 16px; border: 1.5px solid #d8deda; border-radius: 20px; background: transparent; font-size: 14px; font-weight: 500; cursor: pointer; }
+  h1 { font-size: 26px; font-weight: 700; color: #1a1a1a; margin: 10px 0 16px 0; }
+  .tabs { display: flex; border-bottom: 1.5px solid #e0e0e0; margin-bottom: 0; }
+  .tab { flex: 1; text-align: center; padding-bottom: 12px; font-size: 16px; font-weight: 600; color: #7a7a7a; cursor: pointer; position: relative; }
+  .tab.active { color: #1a1a1a; }
+  .tab.active::after { content: ''; position: absolute; bottom: -1.5px; left: 0; width: 100%; height: 3px; background-color: #128c44; }
+
+  /* Lower Grey Background Area */
+  .lower-content-area { background-color: #f7f8f7; padding: 16px; flex-grow: 1; display: flex; flex-direction: column; }
+  
+  /* Favourites Section */
+  .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .section-title { font-size: 14px; font-weight: 700; color: #1a1a1a; }
+  .see-all { font-size: 14px; font-weight: 600; color: #1a1a1a; cursor: pointer; }
+  
+  .favourites-scroll { display: flex; gap: 16px; overflow-x: auto; padding-top: 6px; padding-bottom: 8px; margin-bottom: 16px; scrollbar-width: none; }
+  .favourites-scroll::-webkit-scrollbar { display: none; }
+  
+  .fav-item { display: flex; flex-direction: column; align-items: center; min-width: 64px; cursor: pointer; position: relative; }
+  .fav-avatar-container { position: relative; width: 56px; height: 56px; }
+  .fav-avatar { width: 100%; height: 100%; border-radius: 50%; border: 1.5px solid #d8deda; display: grid; place-items: center; font-weight: 600; font-size: 15px; color: #1a1a1a; background: #ffffff; }
+  
+  /* 3 Dots Menu Style on Favorites */
+  .fav-dots {
+    position: absolute; top: -4px; right: -4px; width: 20px; height: 20px;
+    background: #ffffff; border: 1px solid #d8deda; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: bold; color: #555; cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 5;
+  }
+  .fav-delete-menu {
+    display: none; position: absolute; top: 22px; right: -10px;
+    background: #ffffff; border: 1px solid #dddddd; border-radius: 6px;
+    padding: 5px 12px; font-size: 12px; font-weight: 600; color: #d9534f;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15); z-index: 20; cursor: pointer; white-space: nowrap;
+  }
+  
+  .fav-name-label { font-size: 11px; text-align: center; color: #333; line-height: 1.2; max-width: 64px; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
+  .fav-subname { font-size: 10px; text-align: center; color: #777; max-width: 64px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .empty-fav { font-size: 13px; color: #888; font-style: italic; margin-bottom: 16px; }
+
+  /* Search Box */
+  .search-box { display: flex; align-items: center; border: 1.5px solid #d8deda; border-radius: 30px; padding: 12px 18px; gap: 12px; margin-bottom: 16px; background: #fff; }
+  .search-box input { border: none; outline: none; width: 100%; font-size: 15px; background: transparent; }
+  
+  /* Bank List */
+  .bank-list { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; flex-grow: 1; min-height: 0;}
+  .bank-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 12px; background: #f7f8f7; border-radius: 12px; margin-bottom: 6px; cursor: pointer; border: 0px solid #f0f2f1; }
+  .bank-row:hover { background: #fafafa; }
+  .bank-info { display: flex; align-items: center; gap: 14px; }
+  .bank-icon { width: 44px; height: 44px; border-radius: 50%; border: 1px solid #e0e0e0; display: flex; align-items: center; justify-content: center; background: #fff; padding: 6px; }
+  .bank-icon img { width: 100%; height: 100%; object-fit: contain; }
+  .bank-name { font-size: 15px; font-weight: 500; color: #333; }
+  .arrow { margin-right: 8px; }
+
+  /* History View */
+  .history-view { display: none; flex-direction: column; gap: 16px; flex-grow: 1; }
+  .history-view.active { display: flex; }
+  .history-card { background: #e8f7ee; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 10px; position: relative; border: 1px solid #d4ede0; }
+  .history-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .history-user { display: flex; align-items: center; gap: 12px; }
+  .history-avatar { width: 44px; height: 44px; border-radius: 50%; background: #fff; display: grid; place-items: center; font-weight: 600; color: #2e2a36; border: 1px solid #ccc; }
+  .history-details h4 { margin: 0; font-size: 15px; font-weight: 700; color: #1a1a1a; }
+  .history-details p { margin: 2px 0 0 0; font-size: 12px; color: #666; }
+  .menu-dots { cursor: pointer; font-size: 18px; font-weight: bold; color: #555; padding: 4px 8px; }
+  .delete-popup { display: none; position: absolute; right: 16px; top: 40px; background: #fff; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10; padding: 8px 16px; cursor: pointer; color: #d9534f; font-weight: 600; font-size: 13px; }
+  .history-amount { font-size: 24px; font-weight: 700; color: #1a1a1a; padding-left: 56px; }
+  .receipt-btn { margin-left: 56px; padding: 6px 18px; background: transparent; border: 1.5px solid #25b368; border-radius: 16px; font-size: 12px; font-weight: 600; cursor: pointer; color: #1a1a1a; }
+</style>
+</head>
+<body>
+  <script src="loader.js"></script>
+
+<div class="container">
+  <!-- Top White Header -->
+  <div class="top-header-area">
+    <div class="top-bar">
+   <button class="back-btn" onclick="window.location.href='index.html?openSend=true'">
+  <svg width="10" height="14" viewBox="0 0 6 14" fill="none" stroke="#2e2a36" stroke-width="1.5">
+  <path d="M6 1L0 7l6 6"/>
+</svg>
+</button>
+      <button class="help-btn">Help</button>
+    </div>
+
+    <h1>Bank Transfer</h1>
+
+    <div class="tabs">
+      <div class="tab active" id="sendTab" onclick="switchTab('send')">Send Money</div>
+      <div class="tab" id="historyTab" onclick="switchTab('history')">History</div>
+    </div>
+  </div>
+
+  <!-- Lower Grey Background Area -->
+  <div class="lower-content-area">
+    <!-- Send Money Tab View -->
+    <div id="sendView" style="display: flex; flex-direction: column; flex-grow: 1; min-height: 0;">
+      <div class="section-header">
+        <span class="section-title">My Bank Favourites</span>
+        <span class="see-all" onclick="switchTab('history')">See All</span>
+      </div>
+      <div class="favourites-scroll" id="bankFavouritesScroll"></div>
+
+      <div class="search-box">
+        <svg width="18" height="18" fill="none" stroke="#555" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="bankSearch" placeholder="Search Bank by Name" onkeyup="filterBankList()">
+      </div>
+
+      <div class="bank-list" id="bankListContainer">
+        <div class="bank-row" onclick="selectBank('ABHI Microfinance Bank', '01_ABHI_Microfinance_Bank.png')"><div class="bank-info"><div class="bank-icon"><img src="01_ABHI_Microfinance_Bank.png" alt="logo"></div><div class="bank-name">ABHI Microfinance Bank</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('Aik Digital', '02_Aik_Digital.png')"><div class="bank-info"><div class="bank-icon"><img src="02_Aik_Digital.png" alt="logo"></div><div class="bank-name">Aik Digital</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('Al Baraka Islamic Bank', '03_Al_Baraka_Islamic_Bank.png')"><div class="bank-info"><div class="bank-icon"><img src="03_Al_Baraka_Islamic_Bank.png" alt="logo"></div><div class="bank-name">Al Baraka Islamic Bank</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('Alfa Pay', '04_Alfa_Pay.png')"><div class="bank-info"><div class="bank-icon"><img src="04_Alfa_Pay.png" alt="logo"></div><div class="bank-name">Alfa Pay</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('Allied Bank', '05_Allied_Bank.png')"><div class="bank-info"><div class="bank-icon"><img src="05_Allied_Bank.png" alt="logo"></div><div class="bank-name">Allied Bank</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('Apna Microfinance Bank', '06_Apna_Microfinance_Bank.png')"><div class="bank-info"><div class="bank-icon"><img src="06_Apna_Microfinance_Bank.png" alt="logo"></div><div class="bank-name">Apna Microfinance Bank</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('Askari Bank', '07_Askari_Bank.png')"><div class="bank-info"><div class="bank-icon"><img src="07_Askari_Bank.png" alt="logo"></div><div class="bank-name">Askari Bank</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('Bank Al Habib', '08_Bank_Al_Habib.png')"><div class="bank-info"><div class="bank-icon"><img src="08_Bank_Al_Habib.png" alt="logo"></div><div class="bank-name">Bank Al Habib</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('Bank Alfalah', '09_Bank_Alfalah.png')"><div class="bank-info"><div class="bank-icon"><img src="09_Bank_Alfalah.png" alt="logo"></div><div class="bank-name">Bank Alfalah</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('BankIslami', '10_BankIslami.png')"><div class="bank-info"><div class="bank-icon"><img src="10_BankIslami.png" alt="logo"></div><div class="bank-name">BankIslami</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('Bank Makramah BML', '11_Bank_Makramah_BML.png')"><div class="bank-info"><div class="bank-icon"><img src="11_Bank_Makramah_BML.png" alt="logo"></div><div class="bank-name">Bank Makramah BML</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('Bank of Punjab', '12_Bank_of_Punjab.png')"><div class="bank-info"><div class="bank-icon"><img src="12_Bank_of_Punjab.png" alt="logo"></div><div class="bank-name">Bank of Punjab</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('Bank of Khyber', '13_Bank_of_Khyber.png')"><div class="bank-info"><div class="bank-icon"><img src="13_Bank_of_Khyber.png" alt="logo"></div><div class="bank-name">Bank of Khyber</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('Burj Bank', '14_Burj_Bank.png')"><div class="bank-info"><div class="bank-icon"><img src="14_Burj_Bank.png" alt="logo"></div><div class="bank-name">Burj Bank</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('CDNS', '15_CDNS.png')"><div class="bank-info"><div class="bank-icon"><img src="15_CDNS.png" alt="logo"></div><div class="bank-name">CDNS</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('Citi Bank', '16_Citi_Bank.png')"><div class="bank-info"><div class="bank-icon"><img src="16_Citi_Bank.png" alt="logo"></div><div class="bank-name">Citi Bank</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('Digit', '17_Digit.png')"><div class="bank-info"><div class="bank-icon"><img src="17_Digit.png" alt="logo"></div><div class="bank-name">Digit</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('Dubai Islamic Bank', '18_Dubai_Islamic_Bank.png')"><div class="bank-info"><div class="bank-icon"><img src="18_Dubai_Islamic_Bank.png" alt="logo"></div><div class="bank-name">Dubai Islamic Bank</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('Faysal Bank', '19_Faysal_Bank.png')"><div class="bank-info"><div class="bank-icon"><img src="19_Faysal_Bank.png" alt="logo"></div><div class="bank-name">Faysal Bank</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('First Women Bank', '20_First_Women_Bank.png')"><div class="bank-info"><div class="bank-icon"><img src="20_First_Women_Bank.png" alt="logo"></div><div class="bank-name">First Women Bank</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('FirstPay', '21_FirstPay.png')"><div class="bank-info"><div class="bank-icon"><img src="21_FirstPay.png" alt="logo"></div><div class="bank-name">FirstPay</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('HBL Konnect', '22_HBL_Konnect.png')"><div class="bank-info"><div class="bank-icon"><img src="22_HBL_Konnect.png" alt="logo"></div><div class="bank-name">HBL Konnect</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('HBL Microfinance Bank', '23_HBL_Microfinance_Bank.png')"><div class="bank-info"><div class="bank-icon"><img src="23_HBL_Microfinance_Bank.png" alt="logo"></div><div class="bank-name">HBL Microfinance Bank</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('HBL', '24_HBL.png')"><div class="bank-info"><div class="bank-icon"><img src="24_HBL.png" alt="logo"></div><div class="bank-name">HBL</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('Habib Metropolitan Bank', '25_Habib_Metropolitan_Bank.png')"><div class="bank-info"><div class="bank-icon"><img src="25_Habib_Metropolitan_Bank.png" alt="logo"></div><div class="bank-name">Habib Metropolitan Bank</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('Halan', '26_Halan.png')"><div class="bank-info"><div class="bank-icon"><img src="26_Halan.png" alt="logo"></div><div class="bank-name">Halan</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('Hubpay', '27_Hubpay.png')"><div class="bank-info"><div class="bank-icon"><img src="27_Hubpay.png" alt="logo"></div><div class="bank-name">Hubpay</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('HugoBank', '28_HugoBank.png')"><div class="bank-info"><div class="bank-icon"><img src="28_HugoBank.png" alt="logo"></div><div class="bank-name">HugoBank</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('ICBC', '29_ICBC.png')"><div class="bank-info"><div class="bank-icon"><img src="29_ICBC.png" alt="logo"></div><div class="bank-name">ICBC</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('JS Bank', '30_JS_Bank.png')"><div class="bank-info"><div class="bank-icon"><img src="30_JS_Bank.png" alt="logo"></div><div class="bank-name">JS Bank</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('JazzCash', '31_JazzCash.png')"><div class="bank-info"><div class="bank-icon"><img src="31_JazzCash.png" alt="logo"></div><div class="bank-name">JazzCash</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('KASB Bank', '32_KASB_Bank.png')"><div class="bank-info"><div class="bank-icon"><img src="32_KASB_Bank.png" alt="logo"></div><div class="bank-name">KASB Bank</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('KEENU', '33_KEENU.png')"><div class="bank-info"><div class="bank-icon"><img src="33_KEENU.png" alt="logo"></div><div class="bank-name">KEENU</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('Khushhali Microfinance Bank', '34_Khushhali_Microfinance_Bank.png')"><div class="bank-info"><div class="bank-icon"><img src="34_Khushhali_Microfinance_Bank.png" alt="logo"></div><div class="bank-name">Khushhali Microfinance Bank</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('LOLC Microfinance Bank', '35_LOLC_Microfinance_Bank.png')"><div class="bank-info"><div class="bank-icon"><img src="35_LOLC_Microfinance_Bank.png" alt="logo"></div><div class="bank-name">LOLC Microfinance Bank</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('MCB Bank', '36_MCB_Bank.png')"><div class="bank-info"><div class="bank-icon"><img src="36_MCB_Bank.png" alt="logo"></div><div class="bank-name">MCB Bank</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('MCB Funds', '37_MCB_Funds.png')"><div class="bank-info"><div class="bank-icon"><img src="37_MCB_Funds.png" alt="logo"></div><div class="bank-name">MCB Funds</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('MCB Islamic Bank', '38_MCB_Islamic_Bank.png')"><div class="bank-info"><div class="bank-icon"><img src="38_MCB_Islamic_Bank.png" alt="logo"></div><div class="bank-name">MCB Islamic Bank</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('Mashreq Bank', '39_Mashreq_Bank.png')"><div class="bank-info"><div class="bank-icon"><img src="39_Mashreq_Bank.png" alt="logo"></div><div class="bank-name">Mashreq Bank</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('Meezan Bank', '40_Meezan_Bank.png')"><div class="bank-info"><div class="bank-icon"><img src="40_Meezan_Bank.png" alt="logo"></div><div class="bank-name">Meezan Bank</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('Mobilink Microfinance Bank', '41_Mobilink_Microfinance_Bank.png')"><div class="bank-info"><div class="bank-icon"><img src="41_Mobilink_Microfinance_Bank.png" alt="logo"></div><div class="bank-name">Mobilink Microfinance Bank</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('NIB Bank', '42_NIB_Bank.png')"><div class="bank-info"><div class="bank-icon"><img src="42_NIB_Bank.png" alt="logo"></div><div class="bank-name">NIB Bank</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('NRSP Bank', '43_NRSP_Bank.png')"><div class="bank-info"><div class="bank-icon"><img src="43_NRSP_Bank.png" alt="logo"></div><div class="bank-name">NRSP Bank</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('National Bank of Pakistan', '44_National_Bank_of_Pakistan.png')"><div class="bank-info"><div class="bank-icon"><img src="44_National_Bank_of_Pakistan.png" alt="logo"></div><div class="bank-name">National Bank of Pakistan</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('NayaPay', '45_NayaPay.png')"><div class="bank-info"><div class="bank-icon"><img src="45_NayaPay.png" alt="logo"></div><div class="bank-name">NayaPay</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('OPay', '46_OPay.png')"><div class="bank-info"><div class="bank-icon"><img src="46_OPay.png" alt="logo"></div><div class="bank-name">OPay</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('OneZapp', '47_OneZapp.png')"><div class="bank-info"><div class="bank-icon"><img src="47_OneZapp.png" alt="logo"></div><div class="bank-name">OneZapp</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('PayMax', '48_PayMax.png')"><div class="bank-info"><div class="bank-icon"><img src="48_PayMax.png" alt="logo"></div><div class="bank-name">PayMax</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('PayVay', '49_PayVay.png')"><div class="bank-info"><div class="bank-icon"><img src="49_PayVay.png" alt="logo"></div><div class="bank-name">PayVay</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('Punjab Provincial Cooperative Bank', '50_Punjab_Provincial_Cooperative_Bank.png')"><div class="bank-info"><div class="bank-icon"><img src="50_Punjab_Provincial_Cooperative_Bank.png" alt="logo"></div><div class="bank-name">Punjab Provincial Cooperative Bank</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('Raqami Islamic Digital Bank', '51_Raqami_Islamic_Digital_Bank.png')"><div class="bank-info"><div class="bank-icon"><img src="51_Raqami_Islamic_Digital_Bank.png" alt="logo"></div><div class="bank-name">Raqami Islamic Digital Bank</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('Rupin', '52_Rupin.png')"><div class="bank-info"><div class="bank-icon"><img src="52_Rupin.png" alt="logo"></div><div class="bank-name">Rupin</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('SadaPay', '53_SadaPay.png')"><div class="bank-info"><div class="bank-icon"><img src="53_SadaPay.png" alt="logo"></div><div class="bank-name">SadaPay</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('Samba Bank', '54_Samba_Bank.png')"><div class="bank-info"><div class="bank-icon"><img src="54_Samba_Bank.png" alt="logo"></div><div class="bank-name">Samba Bank</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('SIK Bank', '55_SIK_Bank.png')"><div class="bank-info"><div class="bank-icon"><img src="55_SIK_Bank.png" alt="logo"></div><div class="bank-name">SIK Bank</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('SimSim', '56_SimSim.png')"><div class="bank-info"><div class="bank-icon"><img src="56_SimSim.png" alt="logo"></div><div class="bank-name">SimSim</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('Sindh Bank', '57_Sindh_Bank.png')"><div class="bank-info"><div class="bank-icon"><img src="57_Sindh_Bank.png" alt="logo"></div><div class="bank-name">Sindh Bank</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('Soneri Bank', '58_Soneri_Bank.png')"><div class="bank-info"><div class="bank-icon"><img src="58_Soneri_Bank.png" alt="logo"></div><div class="bank-name">Soneri Bank</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('Standard Chartered Bank', '59_Standard_Chartered_Bank.png')"><div class="bank-info"><div class="bank-icon"><img src="59_Standard_Chartered_Bank.png" alt="logo"></div><div class="bank-name">Standard Chartered Bank</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('U Microfinance Bank', '60_U_Microfinance_Bank.png')"><div class="bank-info"><div class="bank-icon"><img src="60_U_Microfinance_Bank.png" alt="logo"></div><div class="bank-name">U Microfinance Bank</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('UBL', '61_UBL.png')"><div class="bank-info"><div class="bank-icon"><img src="61_UBL.png" alt="logo"></div><div class="bank-name">UBL</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('Upaisa', '62_Upaisa.png')"><div class="bank-info"><div class="bank-icon"><img src="62_Upaisa.png" alt="logo"></div><div class="bank-name">Upaisa</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('NIFT', '63_NIFT.png')"><div class="bank-info"><div class="bank-icon"><img src="63_NIFT.png" alt="logo"></div><div class="bank-name">NIFT</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+        <div class="bank-row" onclick="selectBank('ZTBL', '64_ZTBL.png')"><div class="bank-info"><div class="bank-icon"><img src="64_ZTBL.png" alt="logo"></div><div class="bank-name">ZTBL</div></div><div class="arrow"><svg width="8" height="14" viewBox="0 0 6 14" fill="none" stroke="#888" stroke-width="1.5"><path d="M1 1l5 6-5 6"/></svg></div></div>
+      </div>
+    </div>
+
+    <!-- History Tab View -->
+    <div class="history-view" id="historyView">
+      <div id="bankHistoryContainer" style="display: flex; flex-direction: column; gap: 14px;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  window.onload = function() { loadBankFavourites(); };
+  
+  function goBack() { window.location.href = 'index.html?openSend=true'; }
+  
+  function switchTab(tab) {
+    if(tab === 'send') {
+      document.getElementById('sendTab').classList.add('active');
+      document.getElementById('historyTab').classList.remove('active');
+      document.getElementById('sendView').style.display = 'flex';
+      document.getElementById('historyView').classList.remove('active');
+      loadBankFavourites();
+    } else {
+      document.getElementById('historyTab').classList.add('active');
+      document.getElementById('sendTab').classList.remove('active');
+      document.getElementById('sendView').style.display = 'none';
+      document.getElementById('historyView').classList.add('active');
+      loadBankHistory();
+    }
+  }
+
+  function loadBankFavourites() {
+    const container = document.getElementById('bankFavouritesScroll');
+    let history = [];
+    try { history = JSON.parse(localStorage.getItem('bankHistory') || '[]'); } catch(e) { history = []; }
+    
+    if (history.length === 0) {
+      container.innerHTML = '<div class="empty-fav">No favorites yet. Complete a transaction to add favorites automatically.</div>';
+      return;
+    }
+    
+    container.innerHTML = '';
+    history.forEach((fav, index) => {
+      let initials = fav.name ? fav.name.substring(0,2).toUpperCase() : 'U';
+      let item = document.createElement('div');
+      item.className = 'fav-item';
+      
+      item.innerHTML = `
+        <div class="fav-avatar-container">
+          <div class="fav-avatar">${initials}</div>
+          <div class="fav-dots" onclick="toggleFavDeleteMenu(event, ${index})">⋮</div>
+          <div class="fav-delete-menu" id="favDel_${index}" onclick="deleteFav(event, ${index})">Delete</div>
+        </div>
+        <span class="fav-name-label">${fav.name}</span>
+        <span class="fav-subname">${fav.bank ? fav.bank.split(' ')[0] : ''}</span>
+      `;
+
+      item.onclick = (e) => {
+        if(e.target.classList.contains('fav-dots') || e.target.classList.contains('fav-delete-menu')) return;
+        localStorage.setItem('recBank', fav.bank);
+        localStorage.setItem('recLogo', fav.logo || '');
+        localStorage.setItem('recName', fav.name);
+        localStorage.setItem('recAccount', fav.account);
+        window.location.href = 'amount.html';
+      };
+
+      container.appendChild(item);
+    });
+  }
+
+  function toggleFavDeleteMenu(e, index) {
+    e.stopPropagation();
+    let menu = document.getElementById(`favDel_${index}`);
+    document.querySelectorAll('.fav-delete-menu').forEach(m => { if(m !== menu) m.style.display = 'none'; });
+    menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+  }
+
+  function deleteFav(event, index) {
+    event.stopPropagation();
+    let history = JSON.parse(localStorage.getItem('bankHistory') || '[]');
+    history.splice(index, 1);
+    localStorage.setItem('bankHistory', JSON.stringify(history));
+    loadBankFavourites();
+  }
+
+  function selectBank(bankName, logoSrc) {
+    localStorage.setItem('recBank', bankName);
+    localStorage.setItem('recLogo', logoSrc);
+    window.location.href = 'banksend.html';
+  }
+
+  function loadBankHistory() {
+    let container = document.getElementById('bankHistoryContainer');
+    let history = JSON.parse(localStorage.getItem('bankHistory') || '[]');
+    if(history.length === 0) {
+      container.innerHTML = '<div style="text-align:center; color:#777; margin-top:40px;">No Bank transaction history or favorites found.</div>';
+      return;
+    }
+    container.innerHTML = '';
+    history.forEach((tx, index) => {
+      let card = document.createElement('div');
+      card.className = 'history-card';
+      card.innerHTML = `
+        <div class="history-top">
+          <div class="history-user">
+            <div class="history-avatar">${tx.name.substring(0,2).toUpperCase()}</div>
+            <div class="history-details">
+              <h4>${tx.name}</h4>
+              <p>${tx.bank} • ${tx.account}</p>
+            </div>
+          </div>
+          <div class="menu-dots" onclick="toggleMenu(event, ${index})">⋮</div>
+          <div class="delete-popup" id="delPopup_${index}" onclick="deleteBankTx(${index})">Delete</div>
+        </div>
+        <div class="history-amount">Rs. ${tx.amount || '1,000.00'}</div>
+        <div><button class="receipt-btn" onclick="alert('Viewing receipt for ${tx.name}')">View Receipt</button></div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  function toggleMenu(e, index) {
+    e.stopPropagation();
+    let popup = document.getElementById(`delPopup_${index}`);
+    document.querySelectorAll('.delete-popup').forEach(p => { if(p !== popup) p.style.display = 'none'; });
+    popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
+  }
+
+  window.onclick = function() {
+    document.querySelectorAll('.delete-popup').forEach(p => p.style.display = 'none');
+    document.querySelectorAll('.fav-delete-menu').forEach(m => m.style.display = 'none');
+  }
+
+  function deleteBankTx(index) {
+    let history = JSON.parse(localStorage.getItem('bankHistory') || '[]');
+    history.splice(index, 1);
+    localStorage.setItem('bankHistory', JSON.stringify(history));
+    loadBankHistory();
+  }
+
+  function filterBankList() {
+    let input = document.getElementById('bankSearch').value.toLowerCase();
+    let rows = document.getElementsByClassName('bank-row');
+    for (let i = 0; i < rows.length; i++) {
+      let name = rows[i].getElementsByClassName('bank-name')[0].innerText.toLowerCase();
+      rows[i].style.display = name.includes(input) ? 'flex' : 'none';
+    }
+  }
+</script>
+</body>
+</html>

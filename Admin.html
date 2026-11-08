@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Admin Control Panel</title>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  
+  :root {
+    --bg-main: #f4f7f5;
+    --card-bg: #ffffff;
+    --text-primary: #1a1a1a;
+    --text-secondary: #555555;
+    --accent-green: #25b368;
+    --accent-lime: #aeee00;
+    --accent-gradient: linear-gradient(135deg, #25b368 0%, #1a9653 100%);
+    --danger-red: #e53e3e;
+    --border-color: #e2e8f0;
+    --shadow-soft: 0 4px 20px rgba(37, 179, 104, 0.08);
+  }
+
+  html, body {
+    margin: 0; padding: 0; width: 100%; min-height: 100vh;
+    background-color: var(--bg-main);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-primary);
+    overflow-x: hidden !important;
+    max-width: 100vw;
+  }
+
+  .btn-primary {
+    width: 100%; height: 48px; background: var(--accent-gradient); color: #fff;
+    border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer;
+    border: none; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(37,179,104,0.25);
+  }
+  .btn-primary:hover { opacity: 0.95; transform: translateY(-1px); }
+
+  .input-field {
+    width: 100%; padding: 12px 16px; margin-bottom: 14px;
+    border: 1.5px solid var(--border-color); border-radius: 12px; font-size: 14.5px;
+    color: var(--text-primary); background: #ffffff; outline: none;
+  }
+  .input-field:focus { border-color: var(--accent-green); }
+
+  .login-wrapper {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 16px; background: linear-gradient(180deg, #ffffff 0%, #f4f7f5 100%);
+  }
+  .login-box {
+    width: 100%; max-width: 400px; background: var(--card-bg); padding: 32px 24px;
+    border-radius: 20px; box-shadow: var(--shadow-soft); border: 1px solid var(--border-color);
+    text-align: center; position: relative;
+  }
+  .login-box h2 { margin-top: 10px; margin-bottom: 6px; font-size: 24px; font-weight: 700; }
+  .login-box p { font-size: 13.5px; color: var(--text-secondary); margin-bottom: 20px; }
+
+  .dashboard { display: none; padding: 16px 12px; max-width: 1280px; margin: 0 auto; width: 100%; }
+  
+  .dash-header {
+    background: var(--card-bg); display: flex; flex-direction: column; gap: 14px;
+    padding: 20px; border-radius: 16px; margin-bottom: 20px; box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border-color);
+  }
+  @media(min-width: 640px) {
+    .dash-header { flex-direction: row; justify-content: space-between; align-items: center; }
+  }
+
+  .dash-header h2 { font-size: 20px; margin: 0; font-weight: 700; }
+  
+  .btn-logout {
+    background: #fff; color: var(--danger-red); border: 1.5px solid var(--danger-red);
+    padding: 8px 18px; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 13.5px;
+  }
+
+  .stats-grid {
+    display: grid; grid-template-columns: 1fr; gap: 14px; margin-bottom: 20px;
+  }
+  @media(min-width: 550px) {
+    .stats-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  .stat-card {
+    background: var(--card-bg); padding: 18px; border-radius: 16px;
+    box-shadow: var(--shadow-soft); border: 1px solid var(--border-color); text-align: left;
+  }
+  .stat-card div:first-child { color: var(--text-secondary); font-size: 12px; font-weight: 600; margin-bottom: 6px; text-transform: uppercase; }
+  .stat-card div:last-child { font-size: 24px; font-weight: 800; color: var(--text-primary); }
+
+  .panel-card {
+    background: var(--card-bg); padding: 16px; border-radius: 16px; margin-bottom: 20px;
+    box-shadow: var(--shadow-soft); border: 1px solid var(--border-color);
+  }
+  .panel-card h3 { margin-top: 0; margin-bottom: 14px; font-size: 17px; font-weight: 700; }
+
+  .form-grid {
+    display: grid; grid-template-columns: 1fr; gap: 12px;
+  }
+  @media(min-width: 768px) {
+    .form-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+  }
+
+  .user-card-list {
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .user-card-item {
+    background: #f8fafc; border: 1px solid var(--border-color); border-radius: 12px; padding: 14px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .user-card-header {
+    display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;
+  }
+  .user-card-body {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 13.5px; color: var(--text-secondary);
+  }
+  .user-card-body div span { color: var(--text-primary); font-weight: 600; }
+  .user-card-actions {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; border-top: 1px solid var(--border-color); padding-top: 8px;
+  }
+
+  .user-link {
+    color: var(--accent-green); font-weight: 700; cursor: pointer; text-decoration: none; font-size: 15px;
+  }
+  .user-link:hover { text-decoration: underline; }
+
+  .btn-sm {
+    padding: 6px 10px; border-radius: 8px; border: none; font-size: 11.5px;
+    font-weight: 600; cursor: pointer; color: #fff;
+  }
+  .btn-edit { background: #0ea5e9; }
+  .btn-recharge { background: #25b368; }
+  .btn-block { background: #d97706; }
+  .btn-unblock { background: #10b981; }
+  .btn-admin { background: #059669; }
+  .btn-demote { background: #64748b; }
+  .btn-delete { background: var(--danger-red); }
+
+  /* Custom Popup Modals */
+  .modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center; z-index: 10000; padding: 12px;
+  }
+  .modal-overlay.active { display: flex; }
+  
+  .modal-content {
+    background: var(--card-bg); width: 100%; max-width: 380px;
+    border-radius: 16px; padding: 24px; position: relative;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15); border: 1px solid var(--border-color);
+  }
+  .close-modal {
+    position: absolute; top: 16px; right: 18px; font-size: 18px; cursor: pointer;
+    color: var(--text-secondary); border: none; background: none; font-weight: bold;
+  }
+
+  .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; color: white; display: inline-block; }
+  .badge-master { background: #ef4444; }
+  .badge-admin { background: var(--accent-green); }
+  .badge-user { background: #64748b; }
+</style>
+</head>
+<body>
+
+<!-- Login Screen -->
+<div class="login-wrapper" id="loginWrapper">
+  <div class="login-box">
+    <h2>Admin Access</h2>
+    <p>Sign in with Master or Sub-Admin Account</p>
+    <form onsubmit="handleAdminLogin(event)">
+      <input type="text" id="adminUser" class="input-field" placeholder="Mobile / Username" required>
+      <input type="password" id="adminPass" class="input-field" placeholder="PIN / Password" required>
+      <button type="submit" class="btn-primary" style="margin-top: 4px;">Login to Panel</button>
+    </form>
+  </div>
+</div>
+
+<!-- Main Dashboard -->
+<div class="dashboard" id="dashMain">
+  <div class="dash-header">
+    <div>
+      <h2 id="welcomeTitle">Control Panel</h2>
+      <div style="margin-top: 4px;"><span id="roleBadge" class="badge badge-master">Grand Master Admin</span></div>
+    </div>
+    <button class="btn-logout" onclick="logoutAdmin()">Logout</button>
+  </div>
+
+  <div class="stats-grid" id="statsArea">
+    <div class="stat-card">
+      <div>Total Users</div>
+      <div id="statTotalUsers">0</div>
+    </div>
+    <div class="stat-card">
+      <div>System Balance</div>
+      <div id="statTotalBalance">Rs. 0.00</div>
+    </div>
+    <div class="stat-card">
+      <div>Total Admins</div>
+      <div id="statTotalAdmins">0</div>
+    </div>
+  </div>
+
+  <!-- Master Admin Only: Create User Form -->
+  <div class="panel-card" id="createUserSection">
+    <h3>+ Create New Account</h3>
+    <form onsubmit="createUserInCloud(event)">
+      <div class="form-grid">
+        <input type="text" id="addName" class="input-field" placeholder="Full Name" required>
+        <input type="tel" id="addMobile" class="input-field" placeholder="Mobile (03XXXXXXXXX)" pattern="[0-9]{11}" maxlength="11" required>
+        <input type="password" id="addPassword" class="input-field" placeholder="5-Digit PIN" maxlength="5" required>
+        <input type="number" id="addBalance" class="input-field" value="50000" required>
+        <select id="addRole" class="input-field">
+          <option value="user">Role: Standard User</option>
+          <option value="admin">Role: Sub-Admin</option>
+        </select>
+      </div>
+      <button type="submit" class="btn-primary" style="margin-top: 8px;">Create Account</button>
+    </form>
+  </div>
+
+  <!-- Users List Section -->
+  <div class="panel-card">
+    <h3 id="tableHeading">System Accounts Directory</h3>
+    <div class="user-card-list" id="userCardContainer"></div>
+  </div>
+</div>
+
+<!-- Custom Recharge Popup Modal -->
+<div class="modal-overlay" id="rechargeModal">
+  <div class="modal-content" style="text-align: center;">
+    <button class="close-modal" onclick="closeRechargeModal()">✕</button>
+    <h3 style="margin-top:0; font-size: 18px;">Recharge Balance</h3>
+    <p id="rechargeSubText" style="font-size: 13.5px; color: var(--text-secondary); margin-bottom: 16px;">Enter new balance amount</p>
+    <input type="number" id="customRechargeInput" class="input-field" placeholder="Enter amount (Rs.)" style="text-align: center; font-size: 18px; font-weight: bold;">
+    <div style="display: flex; gap: 10px; margin-top: 10px;">
+      <button type="button" class="btn-primary" style="background: #64748b;" onclick="closeRechargeModal()">Cancel</button>
+      <button type="button" class="btn-primary" onclick="submitCustomRecharge()">Update</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAA5fUGbA6MLxNvsENG1jZFeOdnxp-eSkO",
+    authDomain: "eazypaisa-f7418.firebaseapp.com",
+    projectId: "eazypaisa-f7418",
+    storageBucket: "eazypaisa-f7418.firebasestorage.app",
+    messagingSenderId: "702963002169",
+    appId: "1:702963002169:web:3bfc450e50d413e80a16e8",
+    measurementId: "G-WT86SKYXFT"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  let currentUserRole = 'user';
+  let loggedInUserDocId = '';
+  let activeRechargeDocId = '';
+
+  function handleAdminLogin(e) {
+    e.preventDefault();
+    const uInput = document.getElementById('adminUser').value.trim();
+    const pInput = document.getElementById('adminPass').value.trim();
+
+    if (uInput === 'admin' && pInput === '123') {
+      sessionStorage.setItem('adminRole', 'master');
+      sessionStorage.setItem('adminDocId', 'master');
+      showDashboard();
+      return;
+    }
+
+    db.collection('users').get().then((snapshot) => {
+      let foundAdmin = null;
+      snapshot.forEach(doc => {
+        const d = doc.data();
+        if ((doc.id === uInput || d.account === uInput || d.phone === uInput) && String(d.password).trim() === pInput) {
+          if (d.isAdmin || d.role === 'admin') {
+            foundAdmin = { docId: doc.id, ...d };
+          }
+        }
+      });
+
+      if (foundAdmin) {
+        sessionStorage.setItem('adminRole', 'admin');
+        sessionStorage.setItem('adminDocId', foundAdmin.docId);
+        showDashboard();
+      } else {
+        alert('Invalid Admin Credentials or Account does not have Admin Privileges!');
+      }
+    }).catch(err => alert('Login Error: ' + err.message));
+  }
+
+  function showDashboard() {
+    currentUserRole = sessionStorage.getItem('adminRole') || 'user';
+    loggedInUserDocId = sessionStorage.getItem('adminDocId') || '';
+
+    document.getElementById('loginWrapper').style.display = 'none';
+    document.getElementById('dashMain').style.display = 'block';
+
+    const roleBadge = document.getElementById('roleBadge');
+    if (currentUserRole === 'master') {
+      document.getElementById('welcomeTitle').innerText = "Master Control Panel";
+      roleBadge.innerText = "Grand Master Admin";
+      roleBadge.className = "badge badge-master";
+      document.getElementById('createUserSection').style.display = 'block';
+      document.getElementById('statsArea').style.display = 'grid';
+    } else {
+      document.getElementById('welcomeTitle').innerText = "Sub-Admin Recharge Panel";
+      roleBadge.innerText = "Sub-Admin";
+      roleBadge.className = "badge badge-admin";
+      document.getElementById('createUserSection').style.display = 'none';
+      document.getElementById('statsArea').style.display = 'none';
+    }
+
+    loadCloudUsers();
+  }
+
+  function logoutAdmin() {
+    sessionStorage.removeItem('adminRole');
+    sessionStorage.removeItem('adminDocId');
+    location.reload();
+  }
+
+  function createUserInCloud(e) {
+    e.preventDefault();
+    if (currentUserRole !== 'master') return;
+
+    const name = document.getElementById('addName').value.trim();
+    const mobile = document.getElementById('addMobile').value.trim();
+    const password = document.getElementById('addPassword').value.trim();
+    const balance = Number(document.getElementById('addBalance').value);
+    const role = document.getElementById('addRole').value;
+    const userId = Math.floor(100000 + Math.random() * 900000).toString();
+
+    db.collection('users').doc(mobile).set({
+      id: userId,
+      name: name,
+      account: mobile,
+      phone: mobile,
+      password: password,
+      balance: balance,
+      isBlocked: false,
+      isAdmin: (role === 'admin'),
+      role: role,
+      avatar: 'pp.png'
+    }).then(() => {
+      alert(`Account Created Successfully!\nMobile: ${mobile}\nRole: ${role}`);
+      e.target.reset();
+      document.getElementById('addBalance').value = '50000';
+      loadCloudUsers();
+    }).catch(err => alert('Error: ' + err.message));
+  }
+
+  function loadCloudUsers() {
+    db.collection('users').get().then((querySnapshot) => {
+      const container = document.getElementById('userCardContainer');
+      container.innerHTML = '';
+      let totalBal = 0;
+      let count = 0;
+      let adminCount = 0;
+
+      querySnapshot.forEach((doc) => {
+        const u = doc.data();
+        const docId = doc.id;
+        const isAdminUser = u.isAdmin || u.role === 'admin';
+
+        if (isAdminUser) adminCount++;
+        totalBal += Number(u.balance || 0);
+        count++;
+
+        if (currentUserRole === 'admin' && docId !== loggedInUserDocId && u.account !== loggedInUserDocId) {
+          return;
+        }
+
+        const itemCard = document.createElement('div');
+        itemCard.className = 'user-card-item';
+        
+        let actionsHtml = '';
+
+        if (currentUserRole === 'master') {
+          actionsHtml = `
+            <button class="btn-sm btn-edit" onclick="openEditModal('${docId}')">Edit</button>
+            <button class="btn-sm btn-recharge" onclick="rechargeUser('${docId}', ${u.balance || 0})">Recharge</button>
+            <button class="btn-sm ${u.isBlocked ? 'btn-unblock' : 'btn-block'}" onclick="toggleBlock('${docId}', ${!u.isBlocked})">${u.isBlocked ? 'Unblock' : 'Block'}</button>
+            <button class="btn-sm ${isAdminUser ? 'btn-demote' : 'btn-admin'}" onclick="toggleAdminRole('${docId}', ${!isAdminUser})">${isAdminUser ? 'Remove Admin' : 'Make Admin'}</button>
+            <button class="btn-sm btn-delete" onclick="deleteUser('${docId}')">Delete</button>
+          `;
+        } else {
+          actionsHtml = `
+            <button class="btn-sm btn-recharge" onclick="rechargeUser('${docId}', ${u.balance || 0})">Recharge Balance</button>
+          `;
+        }
+
+        itemCard.innerHTML = `
+          <div class="user-card-header">
+            <div><a class="user-link" href="userprofile.html?docId=${docId}">${u.name || 'Unnamed'}</a> <small style="color:#64748b;">(#${u.id || 'N/A'})</small></div>
+            <div>
+              ${isAdminUser ? '<span class="badge badge-admin">Admin</span>' : '<span class="badge badge-user">User</span>'}
+              ${u.isBlocked ? '<span style="color:red; font-weight:bold; font-size:11px; margin-left:4px;">Blocked</span>' : ''}
+            </div>
+          </div>
+          <div class="user-card-body">
+            <div>Mobile: <span>${u.account || u.phone || docId}</span></div>
+            <div>PIN: <span><code>${u.password || ''}</code></span></div>
+            <div style="grid-column: span 2;">Balance: <span style="color:var(--accent-green);">Rs. ${Number(u.balance || 0).toLocaleString()}</span></div>
+          </div>
+          <div class="user-card-actions">${actionsHtml}</div>
+        `;
+        container.appendChild(itemCard);
+      });
+
+      document.getElementById('statTotalUsers').innerText = count;
+      document.getElementById('statTotalAdmins').innerText = adminCount;
+      document.getElementById('statTotalBalance').innerText = 'Rs. ' + totalBal.toLocaleString();
+    });
+  }
+
+  // Custom Recharge Menu Functions
+  function rechargeUser(docId, currentBal) {
+    activeRechargeDocId = docId;
+    document.getElementById('customRechargeInput').value = currentBal;
+    document.getElementById('rechargeModal').classList.add('active');
+    setTimeout(() => {
+      document.getElementById('customRechargeInput').focus();
+    }, 100);
+  }
+
+  function closeRechargeModal() {
+    document.getElementById('rechargeModal').classList.remove('active');
+    activeRechargeDocId = '';
+  }
+
+  function submitCustomRecharge() {
+    const val = document.getElementById('customRechargeInput').value.trim();
+    if (val === '' || isNaN(val)) {
+      alert('Please enter a valid amount!');
+      return;
+    }
+    const newBal = Number(val);
+    db.collection('users').doc(activeRechargeDocId).update({ balance: newBal }).then(() => {
+      closeRechargeModal();
+      loadCloudUsers();
+    }).catch(err => alert('Error: ' + err.message));
+  }
+
+  function openEditModal(docId) { /* Master editing handled via modal if needed */ }
+  function toggleBlock(docId, status) {
+    db.collection('users').doc(docId).update({ isBlocked: status }).then(() => { loadCloudUsers(); });
+  }
+  function toggleAdminRole(docId, makeAdmin) {
+    db.collection('users').doc(docId).update({ isAdmin: makeAdmin, role: makeAdmin ? 'admin' : 'user' }).then(() => { loadCloudUsers(); });
+  }
+  function deleteUser(docId) {
+    if (confirm('Are you sure?')) { db.collection('users').doc(docId).delete().then(() => { loadCloudUsers(); }); }
+  }
+
+  window.onload = function() {
+    if (sessionStorage.getItem('adminRole')) {
+      showDashboard();
+    }
+  };
+</script>
+</body>
+</html>
