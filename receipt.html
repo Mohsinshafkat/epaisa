@@ -306,6 +306,8 @@
     </svg>
   </button>
 </div>
+<!-- Toast Notification -->
+<div id="toastMsg" style="position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: #ffffff; color: #3d3c3c; padding: 8px 18px; border-radius: 20px; font-size: 13.5px; font-weight: 500; display: none; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">Receipt has been saved</div>
 
 <script>
 window.addEventListener('DOMContentLoaded', () => {
@@ -375,45 +377,51 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('amountDisplay2').innerText = savedAmount;
 });
 
-  document.getElementById('shareBtn').addEventListener('click', () => {
+document.getElementById('shareBtn').addEventListener('click', () => {
     const captureElement = document.getElementById('captureArea');
     
     html2canvas(captureElement, {
-      scale: 2, 
+      scale: 2,
       useCORS: true,
       backgroundColor: null
     }).then(canvas => {
-      canvas.toBlob(async (blob) => {
-        if (!blob) {
-          alert('Image generation failed.');
-          return;
-        }
-        
-        const file = new File([blob], 'easypaisa-receipt.png', { type: 'image/png' });
-        
-        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-          try {
-            await navigator.share({
-              title: 'Transaction Receipt',
-              text: `Transaction Receipt`,
-              files: [file]
-            });
-          } catch (err) {
-            if (err.name !== 'AbortError') {
-              console.log('Share error:', err);
-            }
-          }
+      canvas.toBlob(blob => {
+        const file = new File([blob], `easypaisa-receipt-${Date.now()}.png`, { type: 'image/png' });
+
+        // Check if browser supports sharing files
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          // SIRF IMAGE SHARE HOGI, KOI TEXT YA TITLE NAHI
+          navigator.share({
+            files: [file]
+          }).catch(err => {
+            console.log('User canceled or share failed:', err);
+          });
         } else {
-          alert('Your browser does not support sharing.');
+          // Fallback: Agar browser support nahi karta toh download karwa do
+          const link = document.createElement('a');
+          link.download = `easypaisa-receipt-${Date.now()}.png`;
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+
+          // Toast message show kar dein
+          const toast = document.getElementById('toastMsg');
+          if (toast) {
+            toast.innerText = 'Application is updating. Receipt downloaded!';
+            toast.style.display = 'block';
+            setTimeout(() => {
+              toast.style.display = 'none';
+              toast.innerText = 'Receipt has been saved';
+            }, 3000);
+          }
         }
       }, 'image/png');
     }).catch(err => {
-      console.error('Canvas error:', err);
-      alert('Could not generate receipt.');
+      console.error('Share generation failed:', err);
+      alert('Could not generate receipt for sharing.');
     });
   });
 
-  document.getElementById('downloadBtn').addEventListener('click', () => {
+document.getElementById('downloadBtn').addEventListener('click', () => {
     const captureElement = document.getElementById('captureArea');
     
     html2canvas(captureElement, {
@@ -421,12 +429,30 @@ window.addEventListener('DOMContentLoaded', () => {
       useCORS: true,
       backgroundColor: null
     }).then(canvas => {
+      // Unique filename generate karna taake duplicate download popup na aaye
+      const uniqueName = `easypaisa-receipt-${Date.now()}-${Math.floor(Math.random() * 1000)}.png`;
+
       const link = document.createElement('a');
-      link.download = 'easypaisa-receipt.png';
+      link.download = uniqueName;
       link.href = canvas.toDataURL('image/png');
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      
+      if (document.createEvent) {
+        const e = document.createEvent('MouseEvents');
+        e.initEvent('click', true, true);
+        link.dispatchEvent(e);
+      } else {
+        link.click();
+      }
+
+      // Show "Receipt has been saved" toast notification
+      const toast = document.getElementById('toastMsg');
+      if (toast) {
+        toast.style.display = 'block';
+        setTimeout(() => {
+          toast.style.display = 'none';
+        }, 4000);
+      }
+
     }).catch(err => {
       console.error('Download failed:', err);
       alert('Could not generate receipt image. Please try again.');
