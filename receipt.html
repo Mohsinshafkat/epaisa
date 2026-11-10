@@ -3,8 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#89af9a">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Transaction Successful</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
@@ -22,8 +20,8 @@
     margin: 0; 
     padding: 0;
     width: 100%;
-    min-height: 100%;
-    background: #89af9a;
+    height: 100%;
+    background: linear-gradient(180deg, #b9e4cc 0%, #daf1e3 25%, #ffffff 55%, #ffffff 100%);
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
     overflow-y: auto;
@@ -36,7 +34,6 @@
     justify-content: flex-start;
     align-items: center;
     padding: 0;
-    padding-top: env(safe-area-inset-top);
   }
 
   .page-bg-wrapper {
@@ -45,18 +42,18 @@
     flex-direction: column;
     align-items: center;
     background: linear-gradient(180deg, #89af9a 0%, #daf1e3 25%, #f0f2f1 55%, #ffffff 100%);
-    padding-top: 5px; 
-    padding-bottom: 10px;
+    padding-top: 10px; 
+    padding-bottom: 20px;
   }
 
   .receipt {
-    width: 92%;
+    width: 90%;
     height: auto;
-    max-width: 400px;
+    max-width: 420px;
     margin: 0 auto;
-    padding: 10px 16px 15px;
+    padding: 12px 18px 20px;
     border-radius: 4px;
-    background: linear-gradient(180deg, rgba(242, 255, 248, 0.8) 0%, rgba(245, 248, 246, 0.7) 50%, #ffffff 100%);
+    background: linear-gradient(180deg, rgba(242, 255, 248, 0.664) 0%, rgba(245, 248, 246, 0.596) 50%, #ffffff 100%);
     box-shadow: none;
   }
   .success { 
@@ -65,9 +62,9 @@
   }
   
   .logo-container {
-    width: 100px; 
-    height: 65px;
-    margin: 0 auto 12px;
+    width: 120px; 
+    height: 80px;
+    margin: 0 auto 18px;
     display: grid; 
     place-items: center;
   }
@@ -78,17 +75,17 @@
   }
 
   h1 {
-    font-size: 20px !important;
-    margin: 20px 0 4px !important;
+    font-size: 22px !important;
+    margin: 40px 0 6px !important;
     font-weight: 400;
     -webkit-text-stroke: 0.2px #050000;
     color: #24222b;
   }
 
   .subtitle {
-    font-size: 14px;
+    font-size: 15px;
     color: #55515e;
-    margin: 0 0 12px;
+    margin: 0 0 18px;
   }
 
   .line { 
@@ -96,8 +93,8 @@
     justify-content: space-between; 
     align-items: baseline; 
     gap: 12px; 
-    margin: 7px 0; 
-    font-size: 13.5px;
+    margin: 10px 0; 
+    font-size: 14.2px;
   }
   .line .value { 
     text-align: right; 
@@ -108,16 +105,16 @@
   
   .section-title { 
     font-weight: 700; 
-    font-size: 14px; 
+    font-size: 15px; 
     color: #3b3742; 
-    margin: 8px 0 4px; 
+    margin: 12px 0 6px; 
   }
   
   .rule { 
     height: 1px; 
     background: #d8deda; 
     width: 100%; 
-    margin: 7px 0; 
+    margin: 10px 0; 
   }
 
   .total { 
@@ -125,12 +122,12 @@
     justify-content: space-between; 
     align-items: baseline; 
     gap: 12px; 
-    margin: 8px 0; 
+    margin: 12px 0; 
     font-weight: 700; 
-    font-size: 14px;
+    font-size: 15px;
   }
   .total .value { 
-    font-size: 18px; 
+    font-size: 20px; 
     white-space: nowrap; 
     color: #000000; 
   }
@@ -140,9 +137,9 @@
     align-items: baseline; 
     justify-content: center; 
     gap: 6px; 
-    margin-top: 10px; 
-    margin-bottom: -15px; 
-    font-size: 12px; 
+    margin-top: 16px; 
+    margin-bottom: -30px; 
+    font-size: 13px; 
     color: #55515e; 
   }
   .paid-via-logo-wrap {
@@ -152,35 +149,35 @@
     line-height: 1;
   }
   .paid-via-logo-wrap img {
-    height: 14px;
+    height: 15px;
     object-fit: contain;
   }
   .paid-via-logo-wrap small {
-    font-size: 7.5px;
+    font-size: 8px;
     letter-spacing: -0.2px;
     color: #333;
     margin-top: 2px;
   }
 
   .action-buttons-container {
-    width: 92%;
-    max-width: 400px;
+    width: 90%;
+    max-width: 420px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
-    margin-top: 8px;
-    margin-bottom: 12px;
+    gap: 12px;
+    margin-top: 10px;
+    margin-bottom: 10px;
   }
 
   .btn-home {
     flex: 1;
-    height: 44px;
+    height: 48px;
     background-color: transparent;
     border: 1.5px solid #25b368;
     border-radius: 30px;
     color: #000000;
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 500;
     cursor: pointer;
     display: flex;
@@ -197,9 +194,9 @@
   }
 
   .btn-circle {
-    width: 44px;
-    height: 44px;
-    min-width: 44px;
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
     background-color: transparent;
     border: 1.5px solid #25b368;
     border-radius: 50%;
@@ -218,8 +215,8 @@
     color: #ffffff;
   }
   .btn-circle svg {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     fill: none;
     stroke: currentColor;
     stroke-width: 1.8;
@@ -228,10 +225,10 @@
   }
   @media (min-width: 768px) {
     .receipt, .action-buttons-container {
-      max-width: 440px;
+      max-width: 480px;
     }
     .receipt {
-      padding: 20px 20px;
+      padding: 28px 24px;
     }
   }
   #recNameDisplay {
@@ -309,9 +306,8 @@
     </svg>
   </button>
 </div>
-
 <!-- Toast Notification -->
-<div id="toastMsg" style="position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #1e293b; color: #ffffff; padding: 10px 20px; border-radius: 25px; font-size: 13.5px; font-weight: 500; display: none; z-index: 9999; box-shadow: 0 4px 14px rgba(0,0,0,0.3); text-align: center;">Receipt has been saved</div>
+<div id="toastMsg" style="position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: #ffffff; color: #3d3c3c; padding: 8px 18px; border-radius: 20px; font-size: 13.5px; font-weight: 500; display: none; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">Receipt has been saved</div>
 
 <script>
 window.addEventListener('DOMContentLoaded', () => {
@@ -381,7 +377,6 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('amountDisplay2').innerText = savedAmount;
 });
 
-// 1. Share Functionality (Opens Mobile System Share Menu)
 document.getElementById('shareBtn').addEventListener('click', () => {
     const captureElement = document.getElementById('captureArea');
     
@@ -391,27 +386,41 @@ document.getElementById('shareBtn').addEventListener('click', () => {
       backgroundColor: null
     }).then(canvas => {
       canvas.toBlob(blob => {
-        if (!blob) return;
-        const file = new File([blob], `easypaisa-receipt.png`, { type: 'image/png' });
+        const file = new File([blob], `easypaisa-receipt-${Date.now()}.png`, { type: 'image/png' });
 
+        // Check if browser supports sharing files
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          // SIRF IMAGE SHARE HOGI, KOI TEXT YA TITLE NAHI
           navigator.share({
-            title: 'Easypaisa Receipt',
-            text: 'Transaction Receipt',
             files: [file]
           }).catch(err => {
-            console.log('Share dismissed by user', err);
+            console.log('User canceled or share failed:', err);
           });
         } else {
-          alert('Direct image sharing is not supported on this browser.');
+          // Fallback: Agar browser support nahi karta toh download karwa do
+          const link = document.createElement('a');
+          link.download = `easypaisa-receipt-${Date.now()}.png`;
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+
+          // Toast message show kar dein
+          const toast = document.getElementById('toastMsg');
+          if (toast) {
+            toast.innerText = 'Application is updating. Receipt downloaded!';
+            toast.style.display = 'block';
+            setTimeout(() => {
+              toast.style.display = 'none';
+              toast.innerText = 'Receipt has been saved';
+            }, 3000);
+          }
         }
       }, 'image/png');
     }).catch(err => {
       console.error('Share generation failed:', err);
+      alert('Could not generate receipt for sharing.');
     });
-});
+  });
 
-// 2. Download Functionality (Silent Background Download + Toast Only)
 document.getElementById('downloadBtn').addEventListener('click', () => {
     const captureElement = document.getElementById('captureArea');
     
@@ -420,37 +429,35 @@ document.getElementById('downloadBtn').addEventListener('click', () => {
       useCORS: true,
       backgroundColor: null
     }).then(canvas => {
-      const imageBase64 = canvas.toDataURL('image/png');
-      const filename = `easypaisa-receipt-${Date.now()}.png`;
+      // Unique filename generate karna taake duplicate download popup na aaye
+      const uniqueName = `easypaisa-receipt-${Date.now()}-${Math.floor(Math.random() * 1000)}.png`;
 
-      // Invisible Link for Direct Silent Download
       const link = document.createElement('a');
-      link.style.display = 'none';
-      link.href = imageBase64;
-      link.download = filename;
-      document.body.appendChild(link);
+      link.download = uniqueName;
+      link.href = canvas.toDataURL('image/png');
       
-      link.click();
-      
-      setTimeout(() => {
-        document.body.removeChild(link);
-      }, 100);
+      if (document.createEvent) {
+        const e = document.createEvent('MouseEvents');
+        e.initEvent('click', true, true);
+        link.dispatchEvent(e);
+      } else {
+        link.click();
+      }
 
-      // Display "Receipt has been saved" Toast Notification only
+      // Show "Receipt has been saved" toast notification
       const toast = document.getElementById('toastMsg');
       if (toast) {
-        toast.innerText = 'Receipt has been saved';
         toast.style.display = 'block';
         setTimeout(() => {
           toast.style.display = 'none';
-        }, 3500);
+        }, 4000);
       }
 
     }).catch(err => {
       console.error('Download failed:', err);
-      alert('Could not download receipt.');
+      alert('Could not generate receipt image. Please try again.');
     });
-});
+  });
 </script>
 
 </body>
