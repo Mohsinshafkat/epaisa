@@ -1,6 +1,6 @@
 {
-  "name": "\u200Ceasypaisa",
-"short_name": "\u200Ceasypaisa",
+  "name": "‌easypiasa",
+  "short_name": "‌easypiasa",
   "start_url": "/epaisa/",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -11,5 +11,9 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ]
+  ],
+  "orientation": "portrait",
+  "edge_side_panel": {
+    "preferred_width": 0
+  }
 }
