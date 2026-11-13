@@ -195,6 +195,8 @@
 <body>
   <script src="loader.js"></script>
 
+  <audio id="successSound" src="anim1.mp3" preload="auto"></audio>
+
 <div class="mobile-wrapper" id="receiptCard">
   
   <!-- Top Animation Gif (anim1.gif) -->
@@ -249,6 +251,13 @@
 <script>
   window.addEventListener('DOMContentLoaded', () => {
     // 1. Set Amount from localStorage
+     const audio = document.getElementById('successSound');
+      if (audio) {
+      audio.volume = 0.9;
+      audio.play().catch(err => {
+      console.log("Audio autoplay was restricted:", err);
+      });
+    }
     const savedAmount = localStorage.getItem('txAmount') || 'Rs. 5.00';
     document.getElementById('receiptAmount').innerText = savedAmount;
 
