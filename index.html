@@ -818,9 +818,34 @@
   .hub-img:active {
     transform: scale(0.97);
   }
+  /* Splash Screen GIF Overlay */
+  #gifSplashOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    background-color: #ffffff;
+    z-index: 9999999; /* Sab se upar rahega */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s ease;
+  }
+  #gifSplashOverlay img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Agar poori screen cover karni ho toh 'cover', agar cut nahi karni toh 'contain' likhein */
+  }
 </style>
 </head>
 <body>
+  <!-- 7.3 Seconds Start GIF Splash Screen -->
+  <div id="gifSplashOverlay">
+    <img src="start.gif" alt="Loading...">
+  </div>
+  
   <script src="loader.js"></script>
 
 <!-- 2. 5-Digit PIN Popup Modal (Background me Home view show hoga) -->
@@ -1071,6 +1096,22 @@ function closeModal() {
 
 // Initial Load & Auth Sync
 window.addEventListener('DOMContentLoaded', () => {
+  // 7.3 Seconds (7300ms) ke baad GIF splash screen hide karein
+  const splashOverlay = document.getElementById('gifSplashOverlay');
+  if (splashOverlay) {
+    // Agar session mein pehle chal chuki hai toh dobara na chalayein (Optional: agar har baar chalani ho toh if/else hata dein)
+    if (!sessionStorage.getItem('splashPlayed')) {
+      setTimeout(() => {
+        splashOverlay.style.opacity = '0';
+        setTimeout(() => {
+          splashOverlay.style.display = 'none';
+        }, 300);
+        sessionStorage.setItem('splashPlayed', 'true');
+      }, 7300);
+    } else {
+      splashOverlay.style.display = 'none';
+    }
+  }
   const loggedInUser = localStorage.getItem('loggedInUser');
   const isSessionActive = sessionStorage.getItem('isSessionActive');
 
